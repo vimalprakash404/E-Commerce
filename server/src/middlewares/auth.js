@@ -24,13 +24,17 @@ class AuthMiddleware {
 
   // Admin role check using user model
    isAdmin(req, res, next) {
+    console.log("Checking admin role");
+    console.log(req.user);
     if (
       req.user &&
       Array.isArray(req.user.roles) &&
       req.user.roles.includes('admin')
     ) {
+      console.log("User is admin");
       return next();
     }
+    console.log("User is not admin");
     res.status(403).json({ error: 'Forbidden' });
   }
 
