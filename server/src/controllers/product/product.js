@@ -91,7 +91,6 @@ class ProductController {
   // POST /products (admin only)
   async create(req, res) {
     try {
-      // Images should be handled by multer in the route, then passed as req.files or req.body.images
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -99,17 +98,16 @@ class ProductController {
 
       const productData = { ...req.body };
 
-      // If images uploaded via multer
+      // Handle images uploaded via multer
       if (req.files && req.files.length > 0) {
-        productData.images = req.files.map(file => ({
-          url: `/uploads/${file.filename}`,
+        productData.images = req.files.map((file, idx) => ({
+          url: `/uploads/products/${file.filename}`,
           alt: file.originalname,
-          isMain: false,
+          isMain: idx === 0, // First image is main
         }));
-        if (productData.images.length) productData.images[0].isMain = true;
       }
 
-      productData.createdBy = req.user._id; // assuming req.user is set by auth middleware
+      productData.createdBy = req.user._id;
 
       const product = new Product(productData);
       await product.save();
@@ -143,14 +141,13 @@ class ProductController {
 
       const updateData = { ...req.body };
 
-      // If images uploaded via multer
+      // Handle images uploaded via multer
       if (req.files && req.files.length > 0) {
-        updateData.images = req.files.map(file => ({
-          url: `/uploads/${file.filename}`,
+        updateData.images = req.files.map((file, idx) => ({
+          url: `/uploads/products/${file.filename}`,
           alt: file.originalname,
-          isMain: false,
+          isMain: idx === 0, // First image is main
         }));
-        if (updateData.images.length) updateData.images[0].isMain = true;
       }
 
       const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
