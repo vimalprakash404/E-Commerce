@@ -1,11 +1,29 @@
 import React from 'react';
-import { ShoppingCart, Search, Package, Users, DollarSign, TrendingUp, X, Plus, Edit, Trash2, LogOut, User, Settings, Home, Eye, Lock, Mail, Shield, BarChart3, FileText, Star, Heart } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/common/Header/Header';
+import { AppProvider  } from './context/AppContext';
+import { CartProvider } from './context/CartContext';
 
 export default function App() {
   return (
-  <div>
-    <h1>Welcome to Our E-Commerce Store</h1>
-    <p>Shop the latest products at unbeatable prices!</p>
-  </div>
-);
+    <AppProvider>
+      <CartProvider>
+      <Router>
+        <Header />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <h1>Welcome to Our E-Commerce Store</h1>
+                <p>Shop the latest products at unbeatable prices!</p>
+              </>
+            }
+          />
+          {/* Add more routes here as needed */}
+        </Routes>
+      </Router>
+      </CartProvider>
+    </AppProvider>
+  );
 }
