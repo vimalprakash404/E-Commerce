@@ -6,7 +6,7 @@ export default function Logo() {
     return (
         <div className="header-brand">
             <button className="logo" onClick={() => setCurrentView("home")}>
-                <span>ShopHub</span>
+                <span>Taxol</span>
             </button>
         </div>
     );

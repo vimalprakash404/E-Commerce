@@ -4,11 +4,21 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [currentView, setCurrentView] = useState('home');
-
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  
   const value = {
     currentView,
-    setCurrentView
+    setCurrentView,
+    selectedProduct,
+    setSelectedProduct,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
   };
+  
   return (
     <AppContext.Provider value={value}>
       {children}

@@ -4,6 +4,7 @@ import Header from './components/common/Header/Header';
 import { AppProvider  } from './context/AppContext';
 import { CartProvider } from './context/CartContext';
 import Hero from './components/Hero/Hero';
+import ProductGrid from './components/Product/ProductGrid';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Router>
         <Header />
         <Hero/>
+        <ProductGrid/>
       </Router>
       </CartProvider>
     </AppProvider>
