@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { categories } from '../data/products';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
@@ -90,7 +89,6 @@ const ProductList = () => {
           setViewMode={setViewMode}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
-          categories={categories}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />

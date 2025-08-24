@@ -11,7 +11,10 @@ const MAX_HEIGHT = 2000;
 // Set storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../../uploads/products'));
+    const uploadPath = req.baseUrl.includes('category') 
+      ? path.join(__dirname, '../../uploads/categories')
+      : path.join(__dirname, '../../uploads/products');
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

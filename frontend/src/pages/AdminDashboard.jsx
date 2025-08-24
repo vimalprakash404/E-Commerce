@@ -19,6 +19,7 @@ import {
 import AdminProducts from '../components/Admin/AdminProducts';
 import AdminOrders from '../components/Admin/AdminOrders';
 import AdminInventory from '../components/Admin/AdminInventory';
+import AdminCategories from '../components/Admin/AdminCategories';
 import AdminNotifications from '../components/Admin/AdminNotifications';
 import { useSocket } from '../hooks/useSocket';
 import apiService from '../services/api';
@@ -136,6 +137,8 @@ const AdminDashboard = () => {
         return <AdminOrders />;
       case 'inventory':
         return <AdminInventory />;
+      case 'categories':
+        return <AdminCategories />;
       case 'notifications':
         return <AdminNotifications notifications={notifications} setNotifications={setNotifications} />;
       default:
@@ -225,6 +228,13 @@ const AdminDashboard = () => {
         >
           <Package size={20} />
           Products
+        </button>
+        <button
+          className={activeTab === 'categories' ? 'active' : ''}
+          onClick={() => setActiveTab('categories')}
+        >
+          <Package size={20} />
+          Categories
         </button>
         <button
           className={activeTab === 'orders' ? 'active' : ''}

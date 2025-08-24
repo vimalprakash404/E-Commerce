@@ -118,6 +118,45 @@ class ApiService {
     });
   }
 
+  // Category endpoints
+  async getCategories(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const url = `/category${queryString ? `?${queryString}` : ''}`;
+    return this.request(url);
+  }
+
+  async getCategory(id) {
+    return this.request(`/category/${id}`);
+  }
+
+  async createCategory(formData) {
+    return this.request('/category', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        // Don't set Content-Type for FormData
+      },
+    });
+  }
+
+  async updateCategory(id, formData) {
+    return this.request(`/category/${id}`, {
+      method: 'PUT',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        // Don't set Content-Type for FormData
+      },
+    });
+  }
+
+  async deleteCategory(id) {
+    return this.request(`/category/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Cart endpoints
   async getCart() {
     const response = await this.request('/cart');

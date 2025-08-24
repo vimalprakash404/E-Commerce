@@ -3,13 +3,14 @@ import { X, Upload, Trash2 } from 'lucide-react';
 import apiService from '../../services/api';
 
 const ProductForm = ({ product, onSave, onCancel }) => {
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     name: product?.name || '',
     description: product?.description || '',
     shortDescription: product?.shortDescription || '',
     price: product?.price || '',
     comparePrice: product?.comparePrice || '',
-    category: product?.category || 'electronics',
+    category: product?.category?._id || product?.category || '',
     brand: product?.brand || '',
     stock: product?.stock || '',
     lowStockThreshold: product?.lowStockThreshold || 10,
@@ -24,10 +25,18 @@ const ProductForm = ({ product, onSave, onCancel }) => {
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef();
 
-  const categories = [
-    'electronics', 'clothing', 'books', 'home', 'sports', 
-    'beauty', 'toys', 'automotive', 'other'
-  ];
+  // Fetch categories on component mount
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await apiService.getCategories();
+        setCategories(response || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -76,6 +85,7 @@ const ProductForm = ({ product, onSave, onCancel }) => {
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.stock || formData.stock < 0) newErrors.stock = 'Valid stock quantity is required';
+    if (!formData.category) newErrors.category = 'Category is required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -220,13 +230,16 @@ const ProductForm = ({ product, onSave, onCancel }) => {
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
+                className={errors.category ? 'error' : ''}
               >
+                <option value="">Select a category</option>
                 {categories.map(cat => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
+              {errors.category && <span className="error-message">{errors.category}</span>}
             </div>
             
             <div className="form-group">

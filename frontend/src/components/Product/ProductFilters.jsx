@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, List, Search } from 'lucide-react';
+import apiService from '../../services/api';
 
 const ProductFilters = ({
   selectedCategory, setSelectedCategory,
   sortBy, setSortBy,
   viewMode, setViewMode,
   priceRange, setPriceRange,
-  categories,
   searchQuery, setSearchQuery // <-- Add these props
 }) => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await apiService.getCategories();
+        setCategories(response || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <div className="product-list-controls sticky-filter compact-filters">
       <div className="filter-controls">
@@ -28,7 +42,7 @@ const ProductFilters = ({
         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
           <option value="all">All Categories</option>
           {categories.map(category => (
-            <option key={category.id} value={category.slug}>{category.name}</option>
+            <option key={category._id} value={category.slug}>{category.name}</option>
           ))}
         </select>
 

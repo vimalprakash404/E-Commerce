@@ -27,9 +27,9 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: [true, 'Product category is required'],
-    enum: ['electronics', 'clothing', 'books', 'home', 'sports', 'beauty', 'toys', 'automotive', 'other'],
-    lowercase: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: [true, 'Product category is required']
   },
   brand: {
     type: String,

@@ -2487,6 +2487,117 @@ input:focus,
   color: #dc2626;
 }
 
+/* Category Management Styles */
+.admin-categories-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-categories-header h2 {
+  color: #1f2937;
+  margin: 0;
+}
+
+.admin-categories-filters {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.admin-categories-table {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.category-image-cell img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.category-name-cell h4 {
+  margin-bottom: 0.25rem;
+  color: #1f2937;
+}
+
+.category-name-cell p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+  font-family: monospace;
+}
+
+.category-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parent-category-badge {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.parent-category-badge.root {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.product-count-badge {
+  background: #ddd6fe;
+  color: #5b21b6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Category Form Modal */
+.category-form-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.category-form {
+  padding: 2rem;
+}
+
+.image-preview {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Product Form Modal */
 .modal-overlay {
   position: fixed;
