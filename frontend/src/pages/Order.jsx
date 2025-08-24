@@ -31,17 +31,14 @@ const Orders = () => {
   }
 
   const getStatusIcon = (status) => {
-    const statusLower = status.toLowerCase();
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'delivered':
-      case 'Delivered':
         return <CheckCircle className="status-icon delivered" size={20} />;
       case 'shipped':
-      case 'Shipped':
         return <Truck className="status-icon shipped" size={20} />;
       case 'processing':
-      case 'Processing':
       case 'Pending':
+      case 'pending':
         return <Clock className="status-icon processing" size={20} />;
       default:
         return <Package className="status-icon" size={20} />;
@@ -49,20 +46,17 @@ const Orders = () => {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'delivered':
-      case 'Delivered':
         return 'Delivered';
       case 'shipped':
-      case 'Shipped':
         return 'Shipped';
       case 'processing':
-      case 'Processing':
         return 'Processing';
-      case 'Pending':
+      case 'pending':
         return 'Pending';
       default:
-        return status;
+        return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
     }
   };
 
@@ -123,19 +117,19 @@ const Orders = () => {
             className={selectedTab === 'processing' ? 'active' : ''}
             onClick={() => setSelectedTab('processing')}
           >
-            Processing ({orders.filter(o => ['processing', 'Processing', 'Pending'].includes(o.status)).length})
+            Processing ({orders.filter(o => ['processing', 'pending'].includes(o.status.toLowerCase())).length})
           </button>
           <button
             className={selectedTab === 'shipped' ? 'active' : ''}
             onClick={() => setSelectedTab('shipped')}
           >
-            Shipped ({orders.filter(o => ['shipped', 'Shipped'].includes(o.status)).length})
+            Shipped ({orders.filter(o => o.status.toLowerCase() === 'shipped').length})
           </button>
           <button
             className={selectedTab === 'delivered' ? 'active' : ''}
             onClick={() => setSelectedTab('delivered')}
           >
-            Delivered ({orders.filter(o => ['delivered', 'Delivered'].includes(o.status)).length})
+            Delivered ({orders.filter(o => o.status.toLowerCase() === 'delivered').length})
           </button>
         </div>
 
@@ -167,7 +161,7 @@ const Orders = () => {
                       <h4>{item.product?.name || item.name}</h4>
                       <p>Quantity: {item.quantity}</p>
                       <p className="item-price">₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
-                    </div>
+                    <p className="item-price">₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -198,13 +192,13 @@ const Orders = () => {
                   <Eye size={16} />
                   View Details
                 </button>
-                {['shipped', 'Shipped'].includes(order.status) && (
+                {order.status.toLowerCase() === 'shipped' && (
                   <button className="btn btn-secondary">
                     <Truck size={16} />
                     Track Package
                   </button>
                 )}
-                {['delivered', 'Delivered'].includes(order.status) && (
+                {order.status.toLowerCase() === 'delivered' && (
                   <button className="btn btn-secondary">
                     <Download size={16} />
                     Download Invoice

@@ -103,7 +103,8 @@ const Cart = () => {
                 
                 <div className="cart-item-details">
                   <h3>{item.product?.name || item.name || 'Product Name'}</h3>
-                  <p className="cart-item-price">₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
+                  <p className="cart-item-price">₹{(item.product?.price || item.price || 0).toFixed(2)} each</p>
+                  <p className="cart-item-category">{item.product?.category || 'Uncategorized'}</p>
                 </div>
                 
                 <div className="cart-item-controls">
@@ -129,7 +130,7 @@ const Cart = () => {
                 </div>
                 
                 <div className="cart-item-total">
-                  ₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}
+                  <strong>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</strong>
                 </div>
               </div>
             ))}
