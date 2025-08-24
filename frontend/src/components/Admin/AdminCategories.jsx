@@ -67,7 +67,9 @@ const AdminCategories = () => {
       render: (category) => (
         <div className="category-image-cell">
           <img 
-            src={category.image?.url || '/api/placeholder/60/60'} 
+            src={category.image?.url 
+              ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${category.image.url}`
+              : '/api/placeholder/60/60'} 
             alt={category.name}
           />
         </div>

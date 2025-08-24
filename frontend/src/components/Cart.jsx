@@ -98,7 +98,12 @@ const Cart = () => {
             {items.map(item => (
               <div key={item.id} className="cart-item">
                 <div className="cart-item-image">
-                  <img src={item.product?.images?.[0]?.url || item.product?.image || item.image} alt={item.product?.name || item.name} />
+                  <img 
+                    src={item.product?.images?.[0]?.url 
+                      ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${item.product.images[0].url}`
+                      : item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
+                    alt={item.product?.name || item.name} 
+                  />
                 </div>
                 
                 <div className="cart-item-details">

@@ -493,7 +493,9 @@ const Bill = () => {
                   {items.map(item => (
                     <div key={item.id} className="review-item">
                       <img 
-                        src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                        src={item.product?.images?.[0]?.url 
+                          ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${item.product.images[0].url}`
+                          : item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=300'} 
                         alt={item.product?.name || item.name} 
                       />
                       <div className="item-details">
@@ -563,7 +565,9 @@ const Bill = () => {
               {items.map(item => (
                 <div key={item.id} className="summary-item">
                   <img 
-                    src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=60'} 
+                    src={item.product?.images?.[0]?.url 
+                      ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${item.product.images[0].url}`
+                      : item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=60'} 
                     alt={item.product?.name || item.name}
                     className="summary-item-image"
                   />

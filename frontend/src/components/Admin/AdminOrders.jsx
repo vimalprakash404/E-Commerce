@@ -211,7 +211,9 @@ const OrderDetailsModal = ({ order, onClose }) => {
               {order.items.map((item, index) => (
                 <div key={index} className="order-item-row">
                   <img 
-                    src={item.product?.images?.[0]?.url || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
+                    src={item.product?.images?.[0]?.url 
+                      ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${item.product.images[0].url}`
+                      : 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
                     alt={item.product?.name || 'Product'}
                   />
                   <div className="item-details">

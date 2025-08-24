@@ -32,7 +32,7 @@ const ProductDetail = () => {
         </button>
 
         <div className="product-detail-content">
-          <ProductImage image={selectedProduct.image} name={selectedProduct.name} />
+          <ProductImage product={selectedProduct} />
           <ProductInfo
             product={selectedProduct}
             quantity={quantity}

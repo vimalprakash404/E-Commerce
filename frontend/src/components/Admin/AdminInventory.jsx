@@ -70,7 +70,9 @@ const AdminInventory = () => {
       render: (product) => (
         <div className="product-cell">
           <img 
-            src={product.images?.[0]?.url || '/api/placeholder/40/40'} 
+            src={product.images?.[0]?.url 
+              ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${product.images[0].url}`
+              : '/api/placeholder/40/40'} 
             alt={product.name}
           />
           <span>{product.name}</span>

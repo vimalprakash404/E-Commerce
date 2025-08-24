@@ -51,7 +51,9 @@ const ProductCard = ({ product, onViewProduct, onAddToCart }) => {
     <div className="product-card" onClick={handleViewProduct}>
       <div className="product-image">
         <img 
-          src={product.images?.[0]?.url || product.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500'} 
+          src={product.images?.[0]?.url 
+            ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${product.images[0].url}`
+            : product.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500'} 
           alt={product?.name} 
         />
         <div className="product-overlay">

@@ -72,7 +72,9 @@ const AdminProducts = () => {
       render: (product) => (
         <div className="product-image-cell">
           <img 
-            src={product.images?.[0]?.url || '/api/placeholder/60/60'} 
+            src={product.images?.[0]?.url 
+              ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${product.images[0].url}`
+              : '/api/placeholder/60/60'} 
             alt={product.name}
           />
         </div>
