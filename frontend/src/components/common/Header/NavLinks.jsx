@@ -21,6 +21,9 @@ export default function NavLinks({ isMenuOpen }) {
             {isAuthenticated && (
                 <button onClick={() => navigate('/order')}>Orders</button>
             )}
+            {isAuthenticated && user?.roles?.includes('admin') && (
+                <button onClick={() => navigate('/admin')}>Admin</button>
+            )}
             
             {isAuthenticated ? (
                 <>

@@ -111,6 +111,17 @@ class ProductController {
 
       const product = new Product(productData);
       await product.save();
+      
+      // Emit real-time notification to admins
+      const io = req.app.get('io');
+      if (io) {
+        io.to('admin').emit('product_created', {
+          productId: product._id,
+          name: product.name,
+          createdAt: product.createdAt
+        });
+      }
+      
       res.status(201).json(product);
     } catch (err) {
       res.status(500).json({ error: 'Server error', details: err.message });
@@ -152,6 +163,18 @@ class ProductController {
 
       const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
       if (!product) return res.status(404).json({ error: 'Product not found' });
+      
+      // Check for low stock and emit notification
+      const io = req.app.get('io');
+      if (io && product.stock <= product.lowStockThreshold) {
+        io.to('admin').emit('low_stock_alert', {
+          productId: product._id,
+          name: product.name,
+          currentStock: product.stock,
+          threshold: product.lowStockThreshold
+        });
+      }
+      
       res.json(product);
     } catch (err) {
       res.status(500).json({ error: 'Server error', details: err.message });
@@ -168,6 +191,17 @@ class ProductController {
       const { id } = req.params;
       const product = await Product.findByIdAndDelete(id);
       if (!product) return res.status(404).json({ error: 'Product not found' });
+      
+      // Emit real-time notification to admins
+      const io = req.app.get('io');
+      if (io) {
+        io.to('admin').emit('product_deleted', {
+          productId: id,
+          name: product.name,
+          deletedAt: new Date()
+        });
+      }
+      
       res.json({ message: 'Product deleted' });
     } catch (err) {
       res.status(500).json({ error: 'Server error', details: err.message });

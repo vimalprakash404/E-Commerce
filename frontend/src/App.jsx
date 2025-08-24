@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Orders from './pages/Order';
 import Bill from './pages/Bill';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
               <Route path='/signup' element={<Signup/>} />
               <Route path='/bill' element={<Bill/>} />
               <Route path='/order' element={<Orders/>} />
+              <Route path='/admin' element={<AdminDashboard/>} />
             </Routes>
             <Footer />
           </Router>

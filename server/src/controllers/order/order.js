@@ -1,5 +1,6 @@
 const order = require("../../models/order"); 
 const cart = require("../../models/cart");
+const Product = require("../../models/product");
  
 const { body, param, validationResult } = require("express-validator");
 
@@ -31,6 +32,26 @@ class orderController {
                 address: req.body.address,
                 createdAt: new Date()
             });
+
+            // Update product stock
+            for (const item of userCart.items) {
+                await Product.findByIdAndUpdate(
+                    item.product._id,
+                    { $inc: { stock: -item.quantity } }
+                );
+            }
+
+            // Emit real-time notification to admins
+            const io = req.app.get('io');
+            if (io) {
+                io.to('admin').emit('new_order', {
+                    orderId: newOrder._id,
+                    customerName: `${req.user.firstName} ${req.user.lastName}`,
+                    total: total,
+                    itemCount: userCart.items.length,
+                    createdAt: newOrder.createdAt
+                });
+            }
 
             await cart.updateOne({ user: userId }, { $set: { items: [], total: 0 } });
             res.status(201).json(newOrder);
@@ -89,6 +110,24 @@ class orderController {
             if (!updatedOrder) {
                 return res.status(404).json({ message: "Order not found" });
             }
+            
+            // Emit real-time notification
+            const io = req.app.get('io');
+            if (io) {
+                io.to('admin').emit('order_updated', {
+                    orderId: updatedOrder._id,
+                    status: updatedOrder.status,
+                    updatedAt: new Date()
+                });
+                
+                // Notify the customer
+                io.to(`user_${updatedOrder.user}`).emit('order_status_changed', {
+                    orderId: updatedOrder._id,
+                    status: updatedOrder.status,
+                    updatedAt: new Date()
+                });
+            }
+            
             res.json(updatedOrder);
         } catch (err) {
             res.status(500).json({ message: "Server error", error: err.message });

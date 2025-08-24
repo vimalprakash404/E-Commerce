@@ -156,6 +156,29 @@ class ApiService {
       body: JSON.stringify({ status }),
     });
   }
+
+  // Admin product endpoints
+  async createProduct(formData) {
+    return this.request('/product', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        // Don't set Content-Type for FormData
+      },
+    });
+  }
+
+  async updateProduct(id, formData) {
+    return this.request(`/product/${id}`, {
+      method: 'PUT',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        // Don't set Content-Type for FormData
+      },
+    });
+  }
 }
 
 export default new ApiService();
