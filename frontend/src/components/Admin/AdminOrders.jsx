@@ -211,19 +211,21 @@ const OrderDetailsModal = ({ order, onClose }) => {
               {order.items.map((item, index) => (
                 <div key={index} className="order-item-row">
                   <img 
-                    src={item.product?.images?.[0]?.url || '/api/placeholder/60/60'} 
-                    alt={item.product?.name}
+                    src={item.product?.images?.[0]?.url || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
+                    alt={item.product?.name || 'Product'}
                   />
                   <div className="item-details">
-                    <h5>{item.product?.name}</h5>
-                    <p>Quantity: {item.quantity}</p>
-                    <p>Price: ${(item.product?.price || 0).toFixed(2)}</p>
+                    <h5>{item.product?.name || 'Product Name'}</h5>
+                    <p>SKU: {item.product?.sku || 'N/A'}</p>
+            <p><strong>Email:</strong> {order.user?.email || 'N/A'}</p>
+            <p><strong>Phone:</strong> {order.user?.phone || order.address?.phone || 'N/A'}</p>
                   </div>
                   <div className="item-total">
                     ${((item.product?.price || 0) * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}
+            <p><strong>Items Count:</strong> {order.items?.length || 0}</p>
             </div>
           </div>
         </div>

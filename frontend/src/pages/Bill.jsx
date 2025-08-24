@@ -221,7 +221,13 @@ const Bill = () => {
             <p>Thank you for your purchase. Your order #ORD-{Date.now().toString().slice(-6)} has been confirmed.</p>
             <div className="order-summary">
               <h3>Order Summary</h3>
-              <p><strong>Total: ${total.toFixed(2)}</strong></p>
+              <div className="order-summary-details">
+                <p><strong>Items:</strong> {items.length}</p>
+                <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
+                <p><strong>Tax:</strong> ₹{tax.toFixed(2)}</p>
+                <p><strong>Shipping:</strong> {shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</p>
+                <p><strong>Total:</strong> ₹{total.toFixed(2)}</p>
+              </div>
               <p>You will receive a confirmation email shortly.</p>
             </div>
             <div className="success-actions">
@@ -486,10 +492,15 @@ const Bill = () => {
                 <div className="review-items">
                   {items.map(item => (
                     <div key={item.id} className="review-item">
-                      <img src={item.product?.images?.[0]?.url || item.product?.image || item.image} alt={item.product?.name || item.name} />
+                      <img 
+                        src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
+                        alt={item.product?.name || item.name || 'Product'} 
+                      />
                       <div className="item-details">
-                        <h4>{item.product?.name || item.name}</h4>
+                        <h4>{item.product?.name || item.name || 'Product Name'}</h4>
+                        <p className="item-category">{item.product?.category || 'Uncategorized'}</p>
                         <p>Quantity: {item.quantity}</p>
+                        <p>Unit Price: ₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
                         <p className="item-price">₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
@@ -550,7 +561,10 @@ const Bill = () => {
             <div className="summary-items">
               {items.map(item => (
                 <div key={item.id} className="summary-item">
-                  <span>{item.product?.name || item.name} x{item.quantity}</span>
+                  <div className="summary-item-details">
+                    <span className="item-name">{item.product?.name || item.name}</span>
+                    <span className="item-quantity">Qty: {item.quantity}</span>
+                  </div>
                   <span>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
