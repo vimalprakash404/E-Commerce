@@ -190,7 +190,18 @@ const OrderDetailsModal = ({ order, onClose }) => {
           
           <div className="info-section">
             <h4>Shipping Address</h4>
-            <p>{order.address || 'No address provided'}</p>
+            {order.address ? (
+              <div>
+                <p><strong>Name:</strong> {order.address.firstName} {order.address.lastName}</p>
+                <p><strong>Street:</strong> {order.address.street}</p>
+                <p><strong>City:</strong> {order.address.city}, {order.address.state} {order.address.zipCode}</p>
+                <p><strong>Country:</strong> {order.address.country}</p>
+                <p><strong>Email:</strong> {order.address.email}</p>
+                <p><strong>Phone:</strong> {order.address.phone}</p>
+              </div>
+            ) : (
+              <p>No address provided</p>
+            )}
           </div>
           
           <div className="info-section">

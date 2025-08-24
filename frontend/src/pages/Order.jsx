@@ -175,7 +175,18 @@ const Orders = () => {
               <div className="order-details">
                 <div className="shipping-info">
                   <h4>Shipping Address</h4>
-                  <p>{order.address || order.shippingAddress || 'Address not available'}</p>
+                  {order.address ? (
+                    <div>
+                      <p>{order.address.firstName} {order.address.lastName}</p>
+                      <p>{order.address.street}</p>
+                      <p>{order.address.city}, {order.address.state} {order.address.zipCode}</p>
+                      <p>{order.address.country}</p>
+                      <p>Email: {order.address.email}</p>
+                      <p>Phone: {order.address.phone}</p>
+                    </div>
+                  ) : (
+                    <p>Address not available</p>
+                  )}
                   {order.trackingNumber && (
                     <p><strong>Tracking:</strong> {order.trackingNumber}</p>
                   )}

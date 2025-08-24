@@ -134,7 +134,55 @@ class orderController {
 
     // Validators for each endpoint
  placeOrderValidator = [
-    body("address").notEmpty().withMessage("Address is required")
+    body("address").isObject().withMessage("Address must be an object"),
+    body("address.firstName")
+        .notEmpty()
+        .withMessage("First name is required")
+        .isLength({ max: 50 })
+        .withMessage("First name cannot exceed 50 characters")
+        .trim(),
+    body("address.lastName")
+        .notEmpty()
+        .withMessage("Last name is required")
+        .isLength({ max: 50 })
+        .withMessage("Last name cannot exceed 50 characters")
+        .trim(),
+    body("address.email")
+        .isEmail()
+        .withMessage("Please enter a valid email")
+        .normalizeEmail(),
+    body("address.phone")
+        .notEmpty()
+        .withMessage("Phone number is required")
+        .matches(/^\+?[\d\s-()]+$/)
+        .withMessage("Please enter a valid phone number"),
+    body("address.street")
+        .notEmpty()
+        .withMessage("Street address is required")
+        .isLength({ max: 200 })
+        .withMessage("Street address cannot exceed 200 characters")
+        .trim(),
+    body("address.city")
+        .notEmpty()
+        .withMessage("City is required")
+        .isLength({ max: 50 })
+        .withMessage("City cannot exceed 50 characters")
+        .trim(),
+    body("address.state")
+        .notEmpty()
+        .withMessage("State is required")
+        .isLength({ max: 50 })
+        .withMessage("State cannot exceed 50 characters")
+        .trim(),
+    body("address.zipCode")
+        .notEmpty()
+        .withMessage("ZIP code is required")
+        .matches(/^\d{5}(-\d{4})?$/)
+        .withMessage("Please enter a valid ZIP code (e.g., 12345 or 12345-6789)"),
+    body("address.country")
+        .notEmpty()
+        .withMessage("Country is required")
+        .trim()
 ];
 
 

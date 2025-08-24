@@ -19,7 +19,7 @@ const Bill = () => {
     lastName: '',
     email: '',
     phone: '',
-    address: '',
+    street: '',
     city: '',
     state: '',
     zipCode: '',
@@ -39,12 +39,81 @@ const Bill = () => {
   const shipping = subtotal > 50 ? 0 : 9.99;
   const total = subtotal + tax + shipping;
 
+  // Frontend validation
+  const validateBillingInfo = () => {
+    const errors = {};
+    
+    if (!billingInfo.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    } else if (billingInfo.firstName.length > 50) {
+      errors.firstName = 'First name cannot exceed 50 characters';
+    }
+    
+    if (!billingInfo.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    } else if (billingInfo.lastName.length > 50) {
+      errors.lastName = 'Last name cannot exceed 50 characters';
+    }
+    
+    if (!billingInfo.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(billingInfo.email)) {
+      errors.email = 'Please enter a valid email';
+    }
+    
+    if (!billingInfo.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else if (!/^\+?[\d\s-()]+$/.test(billingInfo.phone)) {
+      errors.phone = 'Please enter a valid phone number';
+    }
+    
+    if (!billingInfo.street.trim()) {
+      errors.street = 'Street address is required';
+    } else if (billingInfo.street.length > 200) {
+      errors.street = 'Street address cannot exceed 200 characters';
+    }
+    
+    if (!billingInfo.city.trim()) {
+      errors.city = 'City is required';
+    } else if (billingInfo.city.length > 50) {
+      errors.city = 'City cannot exceed 50 characters';
+    }
+    
+    if (!billingInfo.state.trim()) {
+      errors.state = 'State is required';
+    } else if (billingInfo.state.length > 50) {
+      errors.state = 'State cannot exceed 50 characters';
+    }
+    
+    if (!billingInfo.zipCode.trim()) {
+      errors.zipCode = 'ZIP code is required';
+    } else if (!/^\d{5}(-\d{4})?$/.test(billingInfo.zipCode)) {
+      errors.zipCode = 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)';
+    }
+    
+    if (!billingInfo.country.trim()) {
+      errors.country = 'Country is required';
+    }
+    
+    return errors;
+  };
+
+  const [validationErrors, setValidationErrors] = useState({});
+
   const handleBillingChange = (e) => {
     const { name, value } = e.target;
     setBillingInfo(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const handlePaymentChange = (e) => {
@@ -56,13 +125,20 @@ const Bill = () => {
   };
 
   const handlePlaceOrder = async () => {
+    // Validate billing info
+    const errors = validateBillingInfo();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      setCurrentStep(1); // Go back to billing step if there are errors
+      return;
+    }
+    
     try {
       setPlacingOrder(true);
       setOrderError(null);
       
       const orderData = {
-        address: `${billingInfo.address}, ${billingInfo.city}, ${billingInfo.state} ${billingInfo.zipCode}`,
-        billingInfo,
+        address: billingInfo,
         paymentInfo: {
           ...paymentInfo,
           cardNumber: paymentInfo.cardNumber.replace(/\s/g, ''), // Remove spaces
@@ -73,7 +149,13 @@ const Bill = () => {
       await clearCart();
       setOrderPlaced(true);
     } catch (error) {
-      setOrderError(error.message);
+      if (error.message.includes('validation')) {
+        // Handle backend validation errors
+        setOrderError('Please check your billing information and try again.');
+        setCurrentStep(1);
+      } else {
+        setOrderError(error.message);
+      }
     } finally {
       setPlacingOrder(false);
     }
@@ -193,10 +275,12 @@ const Bill = () => {
                           name="firstName"
                           value={billingInfo.firstName}
                           onChange={handleBillingChange}
+                          className={validationErrors.firstName ? 'error' : ''}
                           placeholder="First name"
                           required
                         />
                       </div>
+                      {validationErrors.firstName && <span className="error-message">{validationErrors.firstName}</span>}
                     </div>
                     <div className="form-group">
                       <label>Last Name</label>
@@ -207,10 +291,12 @@ const Bill = () => {
                           name="lastName"
                           value={billingInfo.lastName}
                           onChange={handleBillingChange}
+                          className={validationErrors.lastName ? 'error' : ''}
                           placeholder="Last name"
                           required
                         />
                       </div>
+                      {validationErrors.lastName && <span className="error-message">{validationErrors.lastName}</span>}
                     </div>
                   </div>
 
@@ -224,10 +310,12 @@ const Bill = () => {
                           name="email"
                           value={billingInfo.email}
                           onChange={handleBillingChange}
+                          className={validationErrors.email ? 'error' : ''}
                           placeholder="Email address"
                           required
                         />
                       </div>
+                      {validationErrors.email && <span className="error-message">{validationErrors.email}</span>}
                     </div>
                     <div className="form-group">
                       <label>Phone</label>
@@ -238,10 +326,12 @@ const Bill = () => {
                           name="phone"
                           value={billingInfo.phone}
                           onChange={handleBillingChange}
+                          className={validationErrors.phone ? 'error' : ''}
                           placeholder="Phone number"
                           required
                         />
                       </div>
+                      {validationErrors.phone && <span className="error-message">{validationErrors.phone}</span>}
                     </div>
                   </div>
 
@@ -251,13 +341,15 @@ const Bill = () => {
                       <MapPin size={20} />
                       <input
                         type="text"
-                        name="address"
-                        value={billingInfo.address}
+                        name="street"
+                        value={billingInfo.street}
                         onChange={handleBillingChange}
+                        className={validationErrors.street ? 'error' : ''}
                         placeholder="Street address"
                         required
                       />
                     </div>
+                    {validationErrors.street && <span className="error-message">{validationErrors.street}</span>}
                   </div>
 
                   <div className="form-row">
@@ -268,9 +360,11 @@ const Bill = () => {
                         name="city"
                         value={billingInfo.city}
                         onChange={handleBillingChange}
+                        className={validationErrors.city ? 'error' : ''}
                         placeholder="City"
                         required
                       />
+                      {validationErrors.city && <span className="error-message">{validationErrors.city}</span>}
                     </div>
                     <div className="form-group">
                       <label>State</label>
@@ -279,9 +373,11 @@ const Bill = () => {
                         name="state"
                         value={billingInfo.state}
                         onChange={handleBillingChange}
+                        className={validationErrors.state ? 'error' : ''}
                         placeholder="State"
                         required
                       />
+                      {validationErrors.state && <span className="error-message">{validationErrors.state}</span>}
                     </div>
                     <div className="form-group">
                       <label>ZIP Code</label>
@@ -290,9 +386,11 @@ const Bill = () => {
                         name="zipCode"
                         value={billingInfo.zipCode}
                         onChange={handleBillingChange}
+                        className={validationErrors.zipCode ? 'error' : ''}
                         placeholder="ZIP"
                         required
                       />
+                      {validationErrors.zipCode && <span className="error-message">{validationErrors.zipCode}</span>}
                     </div>
                   </div>
                 </form>
@@ -402,8 +500,9 @@ const Bill = () => {
                   <div className="billing-address">
                     <h4>Billing Address</h4>
                     <p>{billingInfo.firstName} {billingInfo.lastName}</p>
-                    <p>{billingInfo.address}</p>
+                    <p>{billingInfo.street}</p>
                     <p>{billingInfo.city}, {billingInfo.state} {billingInfo.zipCode}</p>
+                    <p>{billingInfo.country}</p>
                     <p>{billingInfo.email}</p>
                     <p>{billingInfo.phone}</p>
                   </div>
