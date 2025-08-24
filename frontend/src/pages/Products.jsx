@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { products, categories } from '../data/products';
+import { categories } from '../data/products';
+import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
 import ProductFilters from '../components/Product/ProductFilters';
@@ -14,7 +15,14 @@ const ProductList = () => {
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 500]);
-  const [searchQuery, setSearchQuery] = useState(''); // <-- Add search state
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const { products, loading, error, refetch } = useProducts({
+    search: searchQuery,
+    category: selectedCategory === 'all' ? undefined : selectedCategory,
+    minPrice: priceRange[0],
+    maxPrice: priceRange[1],
+  });
 
   const handleAddToCart = (product) => {
     dispatch({ type: 'ADD_TO_CART', product });
@@ -25,21 +33,33 @@ const ProductList = () => {
     setCurrentView('product-detail');
   };
 
-  const filteredProducts = products
-    .filter(product => {
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()); // <-- Search filter
-      return matchesCategory && matchesPrice && matchesSearch;
-    })
-    .sort((a, b) => {
+  const handleFilterChange = () => {
+    refetch({
+      search: searchQuery,
+      category: selectedCategory === 'all' ? undefined : selectedCategory,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+    });
+  };
+
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleFilterChange();
+    }, 500); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, selectedCategory, priceRange]);
+
+  const sortedProducts = React.useMemo(() => {
+    return [...products].sort((a, b) => {
       switch (sortBy) {
         case 'price-low': return a.price - b.price;
         case 'price-high': return b.price - a.price;
-        case 'rating': return b.rating - a.rating;
+        case 'rating': return (b.averageRating || 0) - (a.averageRating || 0);
         default: return a.name.localeCompare(b.name);
       }
     });
+  }, [products, sortBy]);
 
   return (
     <div className="product-list-page">
@@ -56,21 +76,34 @@ const ProductList = () => {
           priceRange={priceRange}
           setPriceRange={setPriceRange}
           categories={categories}
-          searchQuery={searchQuery} // <-- Pass search props
-          setSearchQuery={setSearchQuery} // <-- Pass search props
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
-        <ResultsInfo count={filteredProducts.length} />
+        <ResultsInfo count={sortedProducts.length} />
 
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            Loading products...
+          </div>
+        )}
+
+        {error && (
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+            Error: {error}
+          </div>
+        )}
         {/* Product Grid/List */}
-        <ProductGrid 
-          products={filteredProducts}
-          viewMode={viewMode}
-          onViewProduct={handleViewProduct}
-          onAddToCart={handleAddToCart}
-        />
+        {!loading && !error && (
+          <ProductGrid 
+            products={sortedProducts}
+            viewMode={viewMode}
+            onViewProduct={handleViewProduct}
+            onAddToCart={handleAddToCart}
+          />
+        )}
 
-        {filteredProducts.length === 0 && (
+        {!loading && !error && sortedProducts.length === 0 && (
           <div className="no-results">
             <p>No products found matching your criteria.</p>
           </div>

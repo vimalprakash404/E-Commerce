@@ -1,10 +1,10 @@
 import React from "react";
 
-const ProductFeatures = ({ features }) => (
+const ProductFeatures = ({ tags }) => (
   <div className="product-features">
-    <h3>Key Features:</h3>
+    {tags && tags.length > 0 && <h3>Key Features:</h3>}
     <ul>
-      {features.map((feature, i) => (
+      {tags?.map((feature, i) => (
         <li key={i}>{feature}</li>
       ))}
     </ul>

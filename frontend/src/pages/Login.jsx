@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
-import { useApp } from '../context/AppContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const navigate = useNavigate()
-  const { setCurrentView } = useApp();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,14 +47,21 @@ const Login = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     
     if (Object.keys(newErrors).length === 0) {
-      // Simulate login success
-      alert('Login successful!');
-      setCurrentView('home');
+      try {
+        setIsLoading(true);
+        setErrors({});
+        await login(formData);
+        navigate('/');
+      } catch (error) {
+        setErrors({ general: error.message });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -72,6 +80,12 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
+            {errors.general && (
+              <div className="error-message" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                {errors.general}
+              </div>
+            )}
+
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
               <div className="input-wrapper">
@@ -121,8 +135,8 @@ const Login = () => {
               <a href="#" className="forgot-password">Forgot password?</a>
             </div>
 
-            <button type="submit" className="btn btn-primary auth-submit">
-              Sign In
+            <button type="submit" className="btn btn-primary auth-submit" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 

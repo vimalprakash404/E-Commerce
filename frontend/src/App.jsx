@@ -16,9 +16,11 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Orders from './pages/Order';
 import Bill from './pages/Bill';
+import { AuthProvider } from './context/AuthContext';
 
 export default function App() {
   return (
+    <AuthProvider>
     <AppProvider>
       <CartProvider>
         <Router>
@@ -38,6 +40,7 @@ export default function App() {
         </Router>
       </CartProvider>
     </AppProvider>
+    </AuthProvider>
   );
 }
     

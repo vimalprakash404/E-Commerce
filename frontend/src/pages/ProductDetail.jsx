@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const ProductDetail = () => {
     const navigate = useNavigate();
-  const { selectedProduct, setCurrentView } = useApp();
+  const { selectedProduct } = useApp();
   const { dispatch } = useCart();
   const [quantity, setQuantity] = useState(1);
 

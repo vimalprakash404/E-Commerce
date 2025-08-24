@@ -14,7 +14,7 @@ const ProductInfo = ({ product, quantity, setQuantity, onAddToCart }) => {
       <p className="product-price">${product.price.toFixed(2)}</p>
       <p className="product-description">{product.description}</p>
 
-      <ProductFeatures features={product.features} />
+      <ProductFeatures features={product.tags} />
 
       <ProductActions
         quantity={quantity}
