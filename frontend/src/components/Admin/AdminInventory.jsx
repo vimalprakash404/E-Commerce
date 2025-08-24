@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Package, TrendingDown, Search } from 'lucide-react';
 import apiService from '../../services/api';
+import AdminTable from '../common/AdminTable';
+import AdminFilters from '../common/AdminFilters';
 
 const AdminInventory = () => {
   const [products, setProducts] = useState([]);
@@ -61,9 +63,80 @@ const AdminInventory = () => {
     totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0)
   };
 
-  if (loading) {
-    return <div className="admin-loading">Loading inventory...</div>;
-  }
+  const columns = [
+    {
+      header: 'Product',
+      key: 'product',
+      render: (product) => (
+        <div className="product-cell">
+          <img 
+            src={product.images?.[0]?.url || '/api/placeholder/40/40'} 
+            alt={product.name}
+          />
+          <span>{product.name}</span>
+        </div>
+      )
+    },
+    {
+      header: 'SKU',
+      key: 'sku',
+      render: (product) => product.sku
+    },
+    {
+      header: 'Category',
+      key: 'category',
+      render: (product) => (
+        <span className="category-badge">
+          {product.category}
+        </span>
+      )
+    },
+    {
+      header: 'Current Stock',
+      key: 'stock',
+      render: (product) => (
+        <input
+          type="number"
+          value={product.stock}
+          onChange={(e) => updateStock(product._id, parseInt(e.target.value) || 0)}
+          className="stock-input"
+          min="0"
+        />
+      )
+    },
+    {
+      header: 'Low Stock Threshold',
+      key: 'lowStockThreshold',
+      render: (product) => product.lowStockThreshold
+    },
+    {
+      header: 'Status',
+      key: 'status',
+      render: (product) => (
+        <span className={`stock-status ${getStockStatus(product)}`}>
+          {getStockStatus(product) === 'out-of-stock' ? 'Out of Stock' :
+           getStockStatus(product) === 'low-stock' ? 'Low Stock' : 'In Stock'}
+        </span>
+      )
+    },
+    {
+      header: 'Value',
+      key: 'value',
+      render: (product) => `$${(product.price * product.stock).toFixed(2)}`
+    }
+  ];
+
+  const filters = [
+    {
+      value: filterType,
+      onChange: setFilterType,
+      options: [
+        { value: 'all', label: 'All Products' },
+        { value: 'low-stock', label: 'Low Stock' },
+        { value: 'out-of-stock', label: 'Out of Stock' }
+      ]
+    }
+  ];
 
   return (
     <div className="admin-inventory">
@@ -113,93 +186,25 @@ const AdminInventory = () => {
         </div>
       </div>
 
-      <div className="admin-inventory-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-        >
-          <option value="all">All Products</option>
-          <option value="low-stock">Low Stock</option>
-          <option value="out-of-stock">Out of Stock</option>
-        </select>
-      </div>
+      <AdminFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search products..."
+        filters={filters}
+      />
 
-      <div className="admin-inventory-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>SKU</th>
-              <th>Category</th>
-              <th>Current Stock</th>
-              <th>Low Stock Threshold</th>
-              <th>Status</th>
-              <th>Value</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map(product => (
-              <tr key={product._id}>
-                <td>
-                  <div className="product-cell">
-                    <img 
-                      src={product.images?.[0]?.url || '/api/placeholder/40/40'} 
-                      alt={product.name}
-                    />
-                    <span>{product.name}</span>
-                  </div>
-                </td>
-                <td>{product.sku}</td>
-                <td>
-                  <span className="category-badge">
-                    {product.category}
-                  </span>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={product.stock}
-                    onChange={(e) => updateStock(product._id, parseInt(e.target.value) || 0)}
-                    className="stock-input"
-                    min="0"
-                  />
-                </td>
-                <td>{product.lowStockThreshold}</td>
-                <td>
-                  <span className={`stock-status ${getStockStatus(product)}`}>
-                    {getStockStatus(product) === 'out-of-stock' ? 'Out of Stock' :
-                     getStockStatus(product) === 'low-stock' ? 'Low Stock' : 'In Stock'}
-                  </span>
-                </td>
-                <td>${(product.price * product.stock).toFixed(2)}</td>
-                <td>
-                  <button 
-                    className="btn btn-sm btn-primary"
-                    onClick={() => {
-                      const newStock = prompt('Enter new stock quantity:', product.stock);
-                      if (newStock !== null) {
-                        updateStock(product._id, parseInt(newStock) || 0);
-                      }
-                    }}
-                  >
-                    Update
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminTable
+        columns={columns}
+        data={filteredProducts}
+        loading={loading}
+        emptyMessage="No products found"
+        onEdit={(product) => {
+          const newStock = prompt('Enter new stock quantity:', product.stock);
+          if (newStock !== null) {
+            updateStock(product._id, parseInt(newStock) || 0);
+          }
+        }}
+      />
     </div>
   );
 };

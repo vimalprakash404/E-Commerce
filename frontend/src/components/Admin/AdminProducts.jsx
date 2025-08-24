@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Eye, Upload } from 'lucide-react';
 import apiService from '../../services/api';
 import ProductForm from './ProductForm';
+import AdminTable from '../common/AdminTable';
+import AdminFilters from '../common/AdminFilters';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -63,9 +65,76 @@ const AdminProducts = () => {
 
   const categories = [...new Set(products.map(p => p.category))];
 
-  if (loading) {
-    return <div className="admin-loading">Loading products...</div>;
-  }
+  const columns = [
+    {
+      header: 'Image',
+      key: 'image',
+      render: (product) => (
+        <div className="product-image-cell">
+          <img 
+            src={product.images?.[0]?.url || '/api/placeholder/60/60'} 
+            alt={product.name}
+          />
+        </div>
+      )
+    },
+    {
+      header: 'Name',
+      key: 'name',
+      render: (product) => (
+        <div className="product-name-cell">
+          <h4>{product.name}</h4>
+          <p>{product.sku}</p>
+        </div>
+      )
+    },
+    {
+      header: 'Category',
+      key: 'category',
+      render: (product) => (
+        <span className="category-badge">
+          {product.category}
+        </span>
+      )
+    },
+    {
+      header: 'Price',
+      key: 'price',
+      render: (product) => `$${product.price.toFixed(2)}`
+    },
+    {
+      header: 'Stock',
+      key: 'stock',
+      render: (product) => (
+        <span className={`stock-badge ${product.stock <= product.lowStockThreshold ? 'low' : 'normal'}`}>
+          {product.stock}
+        </span>
+      )
+    },
+    {
+      header: 'Status',
+      key: 'status',
+      render: (product) => (
+        <span className={`status-badge ${product.isActive ? 'active' : 'inactive'}`}>
+          {product.isActive ? 'Active' : 'Inactive'}
+        </span>
+      )
+    }
+  ];
+
+  const filters = [
+    {
+      value: selectedCategory,
+      onChange: setSelectedCategory,
+      options: [
+        { value: 'all', label: 'All Categories' },
+        ...categories.map(category => ({
+          value: category,
+          label: category.charAt(0).toUpperCase() + category.slice(1)
+        }))
+      ]
+    }
+  ];
 
   return (
     <div className="admin-products">
@@ -80,98 +149,21 @@ const AdminProducts = () => {
         </button>
       </div>
 
-      <div className="admin-products-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="all">All Categories</option>
-          {categories.map(category => (
-            <option key={category} value={category}>
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <AdminFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search products..."
+        filters={filters}
+      />
 
-      <div className="admin-products-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map(product => (
-              <tr key={product._id}>
-                <td>
-                  <div className="product-image-cell">
-                    <img 
-                      src={product.images?.[0]?.url || '/api/placeholder/60/60'} 
-                      alt={product.name}
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div className="product-name-cell">
-                    <h4>{product.name}</h4>
-                    <p>{product.sku}</p>
-                  </div>
-                </td>
-                <td>
-                  <span className="category-badge">
-                    {product.category}
-                  </span>
-                </td>
-                <td>${product.price.toFixed(2)}</td>
-                <td>
-                  <span className={`stock-badge ${product.stock <= product.lowStockThreshold ? 'low' : 'normal'}`}>
-                    {product.stock}
-                  </span>
-                </td>
-                <td>
-                  <span className={`status-badge ${product.isActive ? 'active' : 'inactive'}`}>
-                    {product.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button 
-                      className="btn-icon"
-                      onClick={() => handleEditProduct(product)}
-                      title="Edit"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button 
-                      className="btn-icon delete"
-                      onClick={() => handleDeleteProduct(product._id)}
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminTable
+        columns={columns}
+        data={filteredProducts}
+        onEdit={handleEditProduct}
+        onDelete={(product) => handleDeleteProduct(product._id)}
+        loading={loading}
+        emptyMessage="No products found"
+      />
 
       {showProductForm && (
         <ProductForm
