@@ -1,15 +1,15 @@
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "../../../context/CartContext.jsx";
-import { useApp } from "../../../context/AppContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function CartButton() {
+  const navigate = useNavigate()
   const { getTotalItems } = useCart();
-  const { setCurrentView } = useApp();
 
   return (
     <button 
       className="header-btn cart-btn"
-      onClick={() => setCurrentView("cart")}
+      onClick={() => navigate('/cart')}
     >
       <ShoppingCart size={20} />
       {getTotalItems() > 0 && (

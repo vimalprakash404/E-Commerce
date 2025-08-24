@@ -1,14 +1,15 @@
-import { useApp } from "../../../context/AppContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function NavLinks({ isMenuOpen }) {
-  const { setCurrentView } = useApp();
+    const navigate = useNavigate()
 
-  return (
-    <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
-      <button onClick={() => setCurrentView("home")}>Home</button>
-      <button onClick={() => setCurrentView("products")}>Products</button>
-      <button onClick={() => setCurrentView("about")}>About</button>
-      <button onClick={() => setCurrentView("contact")}>Contact</button>
-    </nav>
-  );
+    return (
+        <nav className={`nav ${isMenuOpen ? "nav-open" : ""}`}>
+            <button onClick={() => navigate("/")}>Home</button>
+            <button onClick={() => navigate('/products')}>Products</button>
+            <button onClick={() => navigate('/order')}>orders</button>
+            
+            <button onClick={() => navigate("/login")}>Login</button>
+        </nav>
+    );
 }

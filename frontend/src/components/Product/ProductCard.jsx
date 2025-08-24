@@ -1,10 +1,12 @@
 import { Star, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   const { dispatch } = useCart();
-  const { setCurrentView, setSelectedProduct } = useApp();
+  const {  setSelectedProduct } = useApp();
+  const navigate = useNavigate();
   
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -13,7 +15,8 @@ const ProductCard = ({ product }) => {
   
   const handleViewProduct = () => {
     setSelectedProduct(product);
-    setCurrentView('product-detail');
+    console.log("----------->",product);
+    navigate('/product-details');
   };
   
   const renderStars = (rating) => {
