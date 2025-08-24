@@ -109,7 +109,8 @@ class ApiService {
 
   // Cart endpoints
   async getCart() {
-    return this.request('/cart');
+    const response = await this.request('/cart');
+    return response || { items: [] };
   }
 
   async addToCart(productId, quantity = 1) {
@@ -134,14 +135,15 @@ class ApiService {
 
   // Order endpoints
   async placeOrder(orderData) {
-    return this.request('/order', {
+    return this.request('/order/', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   }
 
   async getUserOrders() {
-    return this.request('/order/users');
+    const response = await this.request('/order/users');
+    return response || [];
   }
 
   async getAllOrders() {

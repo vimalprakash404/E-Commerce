@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { CreditCard, MapPin, User, Phone, Mail, Lock, Calendar, Download, Printer } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
-import { useApp } from '../context/AppContext.jsx';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 
 const Bill = () => {
     const navigate = useNavigate();
-  const { items, getTotalPrice, dispatch } = useCart();
-  const { setCurrentView } = useApp();
+  const { items, getTotalPrice, clearCart, loading } = useCart();
+  const { isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(null);
   
   const [billingInfo, setBillingInfo] = useState({
     firstName: '',
@@ -52,11 +55,60 @@ const Bill = () => {
     }));
   };
 
-  const handlePlaceOrder = () => {
-    // Simulate order placement
-    setOrderPlaced(true);
-    dispatch({ type: 'CLEAR_CART' });
+  const handlePlaceOrder = async () => {
+    try {
+      setPlacingOrder(true);
+      setOrderError(null);
+      
+      const orderData = {
+        address: `${billingInfo.address}, ${billingInfo.city}, ${billingInfo.state} ${billingInfo.zipCode}`,
+        billingInfo,
+        paymentInfo: {
+          ...paymentInfo,
+          cardNumber: paymentInfo.cardNumber.replace(/\s/g, ''), // Remove spaces
+        }
+      };
+      
+      await apiService.placeOrder(orderData);
+      await clearCart();
+      setOrderPlaced(true);
+    } catch (error) {
+      setOrderError(error.message);
+    } finally {
+      setPlacingOrder(false);
+    }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="bill-page">
+        <div className="bill-container">
+          <div className="empty-cart-message">
+            <h2>Please login to checkout</h2>
+            <p>You need to be logged in to place an order.</p>
+            <button 
+              className="btn btn-primary"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="bill-page">
+        <div className="bill-container">
+          <div className="empty-cart-message">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0 && !orderPlaced) {
     return (
@@ -67,7 +119,7 @@ const Bill = () => {
             <p>Add some items to your cart to proceed with checkout.</p>
             <button 
               className="btn btn-primary"
-              onClick={() => setCurrentView('products')}
+              onClick={() => navigate('/products')}
             >
               Continue Shopping
             </button>
@@ -336,11 +388,11 @@ const Bill = () => {
                 <div className="review-items">
                   {items.map(item => (
                     <div key={item.id} className="review-item">
-                      <img src={item.image} alt={item.name} />
+                      <img src={item.product?.images?.[0]?.url || item.product?.image || item.image} alt={item.product?.name || item.name} />
                       <div className="item-details">
-                        <h4>{item.name}</h4>
+                        <h4>{item.product?.name || item.name}</h4>
                         <p>Quantity: {item.quantity}</p>
-                        <p className="item-price">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="item-price">${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
@@ -379,21 +431,28 @@ const Bill = () => {
               ) : (
                 <button 
                   className="btn btn-primary"
+                  disabled={placingOrder}
                   onClick={handlePlaceOrder}
                 >
-                  Place Order
+                  {placingOrder ? 'Placing Order...' : 'Place Order'}
                 </button>
               )}
             </div>
           </div>
+            {orderError && (
+              <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+                Error placing order: {orderError}
+              </div>
+            )}
+
 
           <div className="order-summary">
             <h3>Order Summary</h3>
             <div className="summary-items">
               {items.map(item => (
                 <div key={item.id} className="summary-item">
-                  <span>{item.name} x{item.quantity}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>{item.product?.name || item.name} x{item.quantity}</span>
+                  <span>${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>

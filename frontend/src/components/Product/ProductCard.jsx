@@ -6,10 +6,15 @@ import { useNavigate } from 'react-router-dom';
 const ProductCard = ({ product }) => {
   const { dispatch } = useCart();
   const {  setSelectedProduct } = useApp();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   const handleAddToCart = (e) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     dispatch({ type: 'ADD_TO_CART', product });
   };
   

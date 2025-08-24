@@ -1,21 +1,73 @@
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
-import { useApp } from '../context/AppContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
-  const { items, dispatch, getTotalPrice, getTotalItems } = useCart();
-  const { setCurrentView } = useApp();
+  const { items, loading, error, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } = useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  const updateQuantity = (productId, newQuantity) => {
-    dispatch({ type: 'UPDATE_QUANTITY', productId, quantity: newQuantity });
+  const handleUpdateQuantity = async (productId, newQuantity) => {
+    try {
+      await updateQuantity(productId, newQuantity);
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
   };
   
-  const removeFromCart = (productId) => {
-    dispatch({ type: 'REMOVE_FROM_CART', productId });
+  const handleRemoveFromCart = async (productId) => {
+    try {
+      await removeFromCart(productId);
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
   };
   
+  if (!isAuthenticated) {
+    return (
+      <div className="cart-empty">
+        <div className="cart-empty-content">
+          <ShoppingBag size={64} />
+          <h2>Please login to view your cart</h2>
+          <p>Sign in to see your saved items and continue shopping</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate('/login')}
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="cart-empty">
+        <div className="cart-empty-content">
+          <p>Loading your cart...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="cart-empty">
+        <div className="cart-empty-content">
+          <p style={{ color: 'red' }}>Error loading cart: {error}</p>
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate('/products')}
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="cart-empty">
@@ -25,7 +77,7 @@ const Cart = () => {
           <p>Start shopping to add items to your cart</p>
           <button 
             className="btn btn-primary"
-            onClick={() => setCurrentView('products')}
+            onClick={() => navigate('/products')}
           >
             Continue Shopping
           </button>
@@ -46,38 +98,38 @@ const Cart = () => {
             {items.map(item => (
               <div key={item.id} className="cart-item">
                 <div className="cart-item-image">
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.product?.images?.[0]?.url || item.product?.image || item.image} alt={item.product?.name || item.name} />
                 </div>
                 
                 <div className="cart-item-details">
-                  <h3>{item.name}</h3>
-                  <p className="cart-item-price">${item.price.toFixed(2)}</p>
+                  <h3>{item.product?.name || item.name}</h3>
+                  <p className="cart-item-price">${(item.product?.price || item.price || 0).toFixed(2)}</p>
                 </div>
                 
                 <div className="cart-item-controls">
                   <div className="quantity-controls">
                     <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => handleUpdateQuantity(item.product?._id || item.product?.id || item.id, item.quantity - 1)}
                       disabled={item.quantity <= 1}
                     >
                       <Minus size={16} />
                     </button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                    <button onClick={() => handleUpdateQuantity(item.product?._id || item.product?.id || item.id, item.quantity + 1)}>
                       <Plus size={16} />
                     </button>
                   </div>
                   
                   <button 
                     className="remove-btn"
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => handleRemoveFromCart(item.product?._id || item.product?.id || item.id)}
                   >
                     <Trash2 size={18} />
                   </button>
                 </div>
                 
                 <div className="cart-item-total">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -108,16 +160,9 @@ const Cart = () => {
             
             <button 
               className="btn btn-secondary continue-shopping"
-              onClick={() => setCurrentView('products')}
+              onClick={() => navigate('/products')}
             >
               Continue Shopping
-            </button>
-            
-            <button 
-              className="btn btn-primary checkout-btn"
-              onClick={() => navigate('/bill')}
-            >
-              Proceed to Checkout
             </button>
           </div>
         </div>

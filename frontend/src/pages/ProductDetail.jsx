@@ -9,14 +9,18 @@ import { useNavigate } from "react-router-dom";
 const ProductDetail = () => {
     const navigate = useNavigate();
   const { selectedProduct } = useApp();
-  const { dispatch } = useCart();
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   if (!selectedProduct) return <div>Product not found</div>;
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      dispatch({ type: "ADD_TO_CART", product: selectedProduct });
+  const handleAddToCart = async () => {
+    try {
+      for (let i = 0; i < quantity; i++) {
+        await addToCart(selectedProduct);
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
   };
 
