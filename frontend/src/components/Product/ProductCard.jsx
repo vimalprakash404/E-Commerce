@@ -2,6 +2,7 @@ import { Star, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../context/CartContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const ProductCard = ({ product }) => {
   const { dispatch } = useCart();
@@ -39,7 +40,7 @@ const ProductCard = ({ product }) => {
       <div className="product-image">
         <img 
           src={product.images?.[0]?.url || product.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500'} 
-          alt={product.name} 
+          alt={product?.name} 
         />
         <div className="product-overlay">
           <button className="quick-add-btn" onClick={handleAddToCart}>
@@ -50,7 +51,7 @@ const ProductCard = ({ product }) => {
       </div>
       
       <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">{product?.name}</h3>
         <div className="product-rating">
           <div className="stars">
             {renderStars(product.averageRating || product.rating)}
@@ -59,7 +60,7 @@ const ProductCard = ({ product }) => {
         </div>
         <p className="product-description">{product.shortDescription || product.description}</p>
         <div className="product-footer">
-          <span className="product-price">${product.price.toFixed(2)}</span>
+          <span className="product-price">₹{product.price.toFixed(2)}</span>
           <span className="product-stock">
             {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
           </span>

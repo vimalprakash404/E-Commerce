@@ -392,7 +392,7 @@ const Bill = () => {
                       <div className="item-details">
                         <h4>{item.product?.name || item.name}</h4>
                         <p>Quantity: {item.quantity}</p>
-                        <p className="item-price">${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
+                        <p className="item-price">₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
@@ -452,7 +452,7 @@ const Bill = () => {
               {items.map(item => (
                 <div key={item.id} className="summary-item">
                   <span>{item.product?.name || item.name} x{item.quantity}</span>
-                  <span>${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</span>
+                  <span>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -460,7 +460,7 @@ const Bill = () => {
             <div className="summary-totals">
               <div className="summary-line">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="summary-line">
                 <span>Shipping:</span>
@@ -468,11 +468,11 @@ const Bill = () => {
               </div>
               <div className="summary-line">
                 <span>Tax:</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>₹{tax.toFixed(2)}</span>
               </div>
               <div className="summary-line total">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
             </div>
           </div>

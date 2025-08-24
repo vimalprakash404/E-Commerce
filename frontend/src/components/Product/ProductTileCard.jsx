@@ -10,17 +10,17 @@ const ProductTileCard = ({ product, viewMode, onViewProduct, onAddToCart }) => {
   return (
     <div className={`product-item ${viewMode}`}>
       <div className="product-image" onClick={() => onViewProduct(product)}>
-        <img src={product.image} alt={product.name} />
+        <img src={product.image} alt={product?.name} />
       </div>
 
       <div className="product-details">
-        <h3 onClick={() => onViewProduct(product)}>{product.name}</h3>
+        <h3 onClick={() => onViewProduct(product)}>{product?.name}</h3>
         <div className="product-rating">
           <div className="stars">{renderStars(product.rating)}</div>
           <span>({product.reviews})</span>
         </div>
         <p className="product-description">{product.description}</p>
-        <div className="product-price">${product.price.toFixed(2)}</div>
+        <div className="product-price">₹{product.price.toFixed(2)}</div>
         <button className="btn btn-primary add-to-cart-btn" onClick={() => onAddToCart(product)}>
           <ShoppingCart size={14} /> Add to Cart
         </button>

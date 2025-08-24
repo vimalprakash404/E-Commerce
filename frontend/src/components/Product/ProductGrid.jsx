@@ -1,30 +1,49 @@
-import React from "react";
-import ProductRating from "./ProductRating";
-import ProductFeatures from "./ProductFeatures";
-import ProductActions from "./ProductActions";
-import ProductInfoTabs from "./ProductInfoTabs";
+import { useProducts } from "../../hooks/useProducts";
+import { useApp } from "../../context/AppContext.jsx";
+import CategoryFilters from "./CategoryFilters";
+import ProductList from "./ProductList";
 
-const ProductInfo = ({ product, quantity, setQuantity, onAddToCart }) => {
+export default function ProductGrid() {
+  const { searchQuery, selectedCategory } = useApp();
+  const { products, loading, error } = useProducts({
+    featured: true, // Show featured products on home page
+    limit: 8 // Limit to 8 products for home page
+  });
+
+  if (loading) {
+    return (
+      <div className="products-section">
+        <div className="products-header">
+          <h2>Our Products</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          Loading products...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="products-section">
+        <div className="products-header">
+          <h2>Our Products</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+          Error loading products: {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="product-detail-info">
-      <h1>{product.name}</h1>
+    <div className="products-section">
+      <div className="products-header">
+        <h2>Our Products</h2>
+        <CategoryFilters />
+      </div>
 
-      <ProductRating rating={product.rating} reviews={product.reviews} />
-
-      <p className="product-price">${product.price.toFixed(2)}</p>
-      <p className="product-description">{product.description}</p>
-
-      <ProductFeatures features={product.features} />
-
-      <ProductActions
-        quantity={quantity}
-        setQuantity={setQuantity}
-        onAddToCart={onAddToCart}
-      />
-
-      <ProductInfoTabs product={product} />
+      <ProductList products={products} />
     </div>
   );
-};
-
-export default ProductInfo;
+}

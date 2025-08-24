@@ -11,10 +11,10 @@ const ProductInfo = ({ product, quantity, setQuantity, onAddToCart }) => {
 
       <ProductRating rating={product.rating} reviews={product.reviews} />
 
-      <p className="product-price">${product.price.toFixed(2)}</p>
+      <p className="product-price">₹{product.price.toFixed(2)}</p>
       <p className="product-description">{product.description}</p>
 
-      <ProductFeatures features={product.tags} />
+      <ProductFeatures features={product.features} />
 
       <ProductActions
         quantity={quantity}

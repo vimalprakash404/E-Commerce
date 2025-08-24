@@ -152,7 +152,7 @@ const Orders = () => {
                   <span>{getStatusText(order.status)}</span>
                 </div>
                 <div className="order-total">
-                  <strong>${(order.totalPrice || order.total || 0).toFixed(2)}</strong>
+                  <strong>₹{(order.totalPrice || order.total || 0).toFixed(2)}</strong>
                 </div>
               </div>
 
@@ -166,7 +166,7 @@ const Orders = () => {
                     <div className="item-details">
                       <h4>{item.product?.name || item.name}</h4>
                       <p>Quantity: {item.quantity}</p>
-                      <p className="item-price">${(item.product?.price || item.price || 0).toFixed(2)}</p>
+                      <p className="item-price">₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}

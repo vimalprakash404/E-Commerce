@@ -49,7 +49,7 @@ const ProductFilters = ({
         </div>
 
         <div className="price-filter">
-          <label>${priceRange[0]} - ${priceRange[1]}</label>
+          <label>₹{priceRange[0]} - ${priceRange[1]}</label>
           <input
             type="range"
             min="0"
