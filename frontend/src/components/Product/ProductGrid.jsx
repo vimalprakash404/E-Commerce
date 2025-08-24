@@ -1,49 +1,30 @@
-import { useProducts } from "../../hooks/useProducts";
+import React from "react";
+import ProductRating from "./ProductRating";
+import ProductFeatures from "./ProductFeatures";
+import ProductActions from "./ProductActions";
+import ProductInfoTabs from "./ProductInfoTabs";
 
-import CategoryFilters from "./CategoryFilters";
-import ProductList from "./ProductList";
-
-export default function ProductGrid() {
-  
-  const { products, loading, error } = useProducts({
-    featured: true, // Show featured products on home page
-    limit: 8 // Limit to 8 products for home page
-  });
-
-  if (loading) {
-    return (
-      <div className="products-section">
-        <div className="products-header">
-          <h2>Our Products</h2>
-        </div>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          Loading products...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="products-section">
-        <div className="products-header">
-          <h2>Our Products</h2>
-        </div>
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
-          Error loading products: {error}
-        </div>
-      </div>
-    );
-  }
-
+const ProductInfo = ({ product, quantity, setQuantity, onAddToCart }) => {
   return (
-    <div className="products-section">
-      <div className="products-header">
-        <h2>Our Products</h2>
-        <CategoryFilters />
-      </div>
+    <div className="product-detail-info">
+      <h1>{product.name}</h1>
 
-      <ProductList products={products} />
+      <ProductRating rating={product.rating} reviews={product.reviews} />
+
+      <p className="product-price">${product.price.toFixed(2)}</p>
+      <p className="product-description">{product.description}</p>
+
+      <ProductFeatures features={product.features} />
+
+      <ProductActions
+        quantity={quantity}
+        setQuantity={setQuantity}
+        onAddToCart={onAddToCart}
+      />
+
+      <ProductInfoTabs product={product} />
     </div>
   );
-}
+};
+
+export default ProductInfo;
