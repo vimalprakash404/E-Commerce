@@ -1,25 +1,40 @@
-import { products } from "../../data/products";
+import { useProducts } from "../../hooks/useProducts";
 import { useApp } from "../../context/AppContext.jsx";
 import CategoryFilters from "./CategoryFilters";
 import ProductList from "./ProductList";
 
 export default function ProductGrid() {
   const { searchQuery, selectedCategory } = useApp();
+  const { products, loading, error } = useProducts({
+    featured: true, // Show featured products on home page
+    limit: 8 // Limit to 8 products for home page
+  });
 
-  const filteredProducts = products.filter((product) => {
-  const name = product?.name?.toLowerCase() || "";
-  const description = product?.description?.toLowerCase() || "";
-  const query = searchQuery?.toLowerCase() || "";
+  if (loading) {
+    return (
+      <div className="products-section">
+        <div className="products-header">
+          <h2>Our Products</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          Loading products...
+        </div>
+      </div>
+    );
+  }
 
-  const matchesSearch =
-    name.includes(query) || description.includes(query);
-
-  const matchesCategory =
-    selectedCategory === "all" || product.category === selectedCategory;
-
-  return matchesSearch && matchesCategory;
-});
- 
+  if (error) {
+    return (
+      <div className="products-section">
+        <div className="products-header">
+          <h2>Our Products</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+          Error loading products: {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="products-section">
@@ -28,7 +43,7 @@ export default function ProductGrid() {
         <CategoryFilters />
       </div>
 
-      <ProductList products={filteredProducts} />
+      <ProductList products={products} />
     </div>
   );
 }

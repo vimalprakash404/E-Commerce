@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, User, Phone } from 'lucide-react';
-import { useApp } from '../context/AppContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
 
 const Signup = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const { setCurrentView } = useApp();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    reEnterPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,14 +62,14 @@ const navigate = useNavigate();
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
     
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+    if (!formData.reEnterPassword) {
+      newErrors.reEnterPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.reEnterPassword) {
+      newErrors.reEnterPassword = 'Passwords do not match';
     }
     
     if (!acceptTerms) {
@@ -78,14 +79,22 @@ const navigate = useNavigate();
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     
     if (Object.keys(newErrors).length === 0) {
-      // Simulate signup success
-      alert('Account created successfully!');
-      setCurrentView('login');
+      try {
+        setIsLoading(true);
+        setErrors({});
+        await register(formData);
+        alert('Account created successfully! Please login.');
+        navigate('/login');
+      } catch (error) {
+        setErrors({ general: error.message });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setErrors(newErrors);
     }
@@ -104,6 +113,12 @@ const navigate = useNavigate();
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
+            {errors.general && (
+              <div className="error-message" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                {errors.general}
+              </div>
+            )}
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="firstName">First Name</label>
@@ -199,17 +214,17 @@ const navigate = useNavigate();
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="reEnterPassword">Confirm Password</label>
               <div className="input-wrapper">
                 <Lock size={20} />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
+                  id="reEnterPassword"
+                  name="reEnterPassword"
+                  value={formData.reEnterPassword}
                   onChange={handleInputChange}
                   placeholder="Confirm your password"
-                  className={errors.confirmPassword ? 'error' : ''}
+                  className={errors.reEnterPassword ? 'error' : ''}
                 />
                 <button
                   type="button"
@@ -219,7 +234,7 @@ const navigate = useNavigate();
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              {errors.reEnterPassword && <span className="error-message">{errors.reEnterPassword}</span>}
             </div>
 
             <div className="form-group">
@@ -236,8 +251,8 @@ const navigate = useNavigate();
               {errors.terms && <span className="error-message">{errors.terms}</span>}
             </div>
 
-            <button type="submit" className="btn btn-primary auth-submit">
-              Create Account
+            <button type="submit" className="btn btn-primary auth-submit" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

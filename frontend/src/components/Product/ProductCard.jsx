@@ -24,7 +24,7 @@ const ProductCard = ({ product }) => {
       <Star
         key={i}
         size={16}
-        className={i < Math.floor(rating) ? 'star-filled' : 'star-empty'}
+        className={i < Math.floor(rating || 0) ? 'star-filled' : 'star-empty'}
       />
     ));
   };
@@ -32,7 +32,10 @@ const ProductCard = ({ product }) => {
   return (
     <div className="product-card" onClick={handleViewProduct}>
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        <img 
+          src={product.images?.[0]?.url || product.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500'} 
+          alt={product.name} 
+        />
         <div className="product-overlay">
           <button className="quick-add-btn" onClick={handleAddToCart}>
             <ShoppingCart size={20} />
@@ -45,14 +48,16 @@ const ProductCard = ({ product }) => {
         <h3 className="product-name">{product.name}</h3>
         <div className="product-rating">
           <div className="stars">
-            {renderStars(product.rating)}
+            {renderStars(product.averageRating || product.rating)}
           </div>
-          <span className="review-count">({product.reviews})</span>
+          <span className="review-count">({product.reviewCount || product.reviews || 0})</span>
         </div>
-        <p className="product-description">{product.description}</p>
+        <p className="product-description">{product.shortDescription || product.description}</p>
         <div className="product-footer">
           <span className="product-price">${product.price.toFixed(2)}</span>
-          <span className="product-stock">In Stock</span>
+          <span className="product-stock">
+            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
         </div>
       </div>
     </div>
