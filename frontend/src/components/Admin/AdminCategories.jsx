@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Eye, Upload } from 'lucide-react';
 import apiService from '../../services/api';
 import CategoryForm from './CategoryForm';
+import AdminTable from '../common/AdminTable';
+import AdminFilters from '../common/AdminFilters';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -58,9 +60,70 @@ const AdminCategories = () => {
     category.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
-    return <div className="admin-loading">Loading categories...</div>;
-  }
+  const columns = [
+    {
+      header: 'Image',
+      key: 'image',
+      render: (category) => (
+        <div className="category-image-cell">
+          <img 
+            src={category.image?.url || '/api/placeholder/60/60'} 
+            alt={category.name}
+          />
+        </div>
+      )
+    },
+    {
+      header: 'Name',
+      key: 'name',
+      render: (category) => (
+        <div className="category-name-cell">
+          <h4>{category.name}</h4>
+          <p>{category.slug}</p>
+        </div>
+      )
+    },
+    {
+      header: 'Description',
+      key: 'description',
+      render: (category) => (
+        <p className="category-description">
+          {category.description || 'No description'}
+        </p>
+      )
+    },
+    {
+      header: 'Parent Category',
+      key: 'parentCategory',
+      render: (category) => (
+        category.parentCategory ? (
+          <span className="parent-category-badge">
+            {category.parentCategory.name}
+          </span>
+        ) : (
+          <span className="parent-category-badge root">Root</span>
+        )
+      )
+    },
+    {
+      header: 'Products',
+      key: 'productCount',
+      render: (category) => (
+        <span className="product-count-badge">
+          {category.productCount || 0}
+        </span>
+      )
+    },
+    {
+      header: 'Status',
+      key: 'status',
+      render: (category) => (
+        <span className={`status-badge ${category.isActive ? 'active' : 'inactive'}`}>
+          {category.isActive ? 'Active' : 'Inactive'}
+        </span>
+      )
+    }
+  ];
 
   return (
     <div className="admin-categories">
@@ -75,95 +138,20 @@ const AdminCategories = () => {
         </button>
       </div>
 
-      <div className="admin-categories-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search categories..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
+      <AdminFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search categories..."
+      />
 
-      <div className="admin-categories-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Parent Category</th>
-              <th>Products</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCategories.map(category => (
-              <tr key={category._id}>
-                <td>
-                  <div className="category-image-cell">
-                    <img 
-                      src={category.image?.url || '/api/placeholder/60/60'} 
-                      alt={category.name}
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div className="category-name-cell">
-                    <h4>{category.name}</h4>
-                    <p>{category.slug}</p>
-                  </div>
-                </td>
-                <td>
-                  <p className="category-description">
-                    {category.description || 'No description'}
-                  </p>
-                </td>
-                <td>
-                  {category.parentCategory ? (
-                    <span className="parent-category-badge">
-                      {category.parentCategory.name}
-                    </span>
-                  ) : (
-                    <span className="parent-category-badge root">Root</span>
-                  )}
-                </td>
-                <td>
-                  <span className="product-count-badge">
-                    {category.productCount || 0}
-                  </span>
-                </td>
-                <td>
-                  <span className={`status-badge ${category.isActive ? 'active' : 'inactive'}`}>
-                    {category.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button 
-                      className="btn-icon"
-                      onClick={() => handleEditCategory(category)}
-                      title="Edit"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button 
-                      className="btn-icon delete"
-                      onClick={() => handleDeleteCategory(category._id)}
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminTable
+        columns={columns}
+        data={filteredCategories}
+        onEdit={handleEditCategory}
+        onDelete={(category) => handleDeleteCategory(category._id)}
+        loading={loading}
+        emptyMessage="No categories found"
+      />
 
       {showCategoryForm && (
         <CategoryForm
