@@ -1372,7 +1372,6 @@ input:focus,
 .auth-form {
   margin-bottom: 2rem;
 }
-
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1399,19 +1398,45 @@ input:focus,
 .input-wrapper svg {
   position: absolute;
   left: 1rem;
+  width: 20px;   /* match <User size={20} /> */
+  height: 20px;
   color: #6b7280;
-  z-index: 1;
+  pointer-events: none; /* clicking focuses input */
 }
 
 .input-wrapper input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 3rem;
+  padding: 0.75rem 1rem 0.75rem 99rem;
+  margin-left: 3rem; 
+  /* top/bottom = 0.75rem, right = 1rem, left = 3.5rem 
+     (1rem left offset + 20px icon + ~1rem spacing) */
+
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 1rem;
+  
   outline: none;
   transition: border-color 0.2s ease;
+  background: white;
+  box-sizing: border-box;
 }
+
+
+.input-wrapper input:focus {
+  border-color: #2563eb;
+}
+
+.input-wrapper input.error {
+  border-color: #ef4444;
+}
+
+.error-message {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
 
 .input-wrapper input:focus {
   border-color: #2563eb;

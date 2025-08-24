@@ -194,7 +194,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
               <div>
                 <p><strong>Name:</strong> {order.address.firstName} {order.address.lastName}</p>
                 <p><strong>Street:</strong> {order.address.street}</p>
-                <p><strong>City:</strong> {order.address.city}, {order.address.state} {order.address.zipCode}</p>
+                <p><strong>City:</strong> {order.address.city}, {order.address.state} {order.address.pinCode}</p>
                 <p><strong>Country:</strong> {order.address.country}</p>
                 <p><strong>Email:</strong> {order.address.email}</p>
                 <p><strong>Phone:</strong> {order.address.phone}</p>

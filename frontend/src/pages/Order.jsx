@@ -179,7 +179,7 @@ const Orders = () => {
                     <div>
                       <p>{order.address.firstName} {order.address.lastName}</p>
                       <p>{order.address.street}</p>
-                      <p>{order.address.city}, {order.address.state} {order.address.zipCode}</p>
+                      <p>{order.address.city}, {order.address.state} {order.address.pinCode}</p>
                       <p>{order.address.country}</p>
                       <p>Email: {order.address.email}</p>
                       <p>Phone: {order.address.phone}</p>

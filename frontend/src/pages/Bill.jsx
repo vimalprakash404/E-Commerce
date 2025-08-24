@@ -22,7 +22,7 @@ const Bill = () => {
     street: '',
     city: '',
     state: '',
-    zipCode: '',
+    pinCode: '',
     country: 'United States'
   });
 
@@ -85,10 +85,10 @@ const Bill = () => {
       errors.state = 'State cannot exceed 50 characters';
     }
     
-    if (!billingInfo.zipCode.trim()) {
-      errors.zipCode = 'ZIP code is required';
-    } else if (!/^\d{5}(-\d{4})?$/.test(billingInfo.zipCode)) {
-      errors.zipCode = 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)';
+    if (!billingInfo.pinCode.trim()) {
+      errors.pinCode = 'Pin codeis required';
+    } else if (!/^\d{5}(-\d{4})?$/.test(billingInfo.pinCode)) {
+      errors.pinCode = 'Please enter a valid Pin code(e.g., 12345 or 12345-6789)';
     }
     
     if (!billingInfo.country.trim()) {
@@ -383,14 +383,14 @@ const Bill = () => {
                       <label>ZIP Code</label>
                       <input
                         type="text"
-                        name="zipCode"
-                        value={billingInfo.zipCode}
+                        name="pinCode"
+                        value={billingInfo.pinCode}
                         onChange={handleBillingChange}
-                        className={validationErrors.zipCode ? 'error' : ''}
+                        className={validationErrors.pinCode ? 'error' : ''}
                         placeholder="ZIP"
                         required
                       />
-                      {validationErrors.zipCode && <span className="error-message">{validationErrors.zipCode}</span>}
+                      {validationErrors.pinCode && <span className="error-message">{validationErrors.pinCode}</span>}
                     </div>
                   </div>
                 </form>
@@ -501,7 +501,7 @@ const Bill = () => {
                     <h4>Billing Address</h4>
                     <p>{billingInfo.firstName} {billingInfo.lastName}</p>
                     <p>{billingInfo.street}</p>
-                    <p>{billingInfo.city}, {billingInfo.state} {billingInfo.zipCode}</p>
+                    <p>{billingInfo.city}, {billingInfo.state} {billingInfo.pinCode}</p>
                     <p>{billingInfo.country}</p>
                     <p>{billingInfo.email}</p>
                     <p>{billingInfo.phone}</p>
