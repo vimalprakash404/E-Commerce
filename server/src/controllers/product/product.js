@@ -1,4 +1,9 @@
-const { body, param, query, validationResult } = require('express-validator');
+const {
+  body,
+  param,
+  query,
+  validationResult
+} = require('express-validator');
 const Product = require('../../models/product');
 
 // For image upload, you will need multer in your route file, not here.
@@ -7,7 +12,7 @@ class ProductController {
   // GET /products?search=&category=&minPrice=&maxPrice=&tags=&featured=&isActive=&page=&limit=
   async getAll(req, res) {
     try {
-      const {
+      let {
         search,
         category,
         minPrice,
@@ -21,44 +26,68 @@ class ProductController {
 
       const filter = {};
 
+      // sanitize "undefined" / "null" values
+      search = search && search !== "undefined" && search !== "null" ? search.trim() : null;
+      category = category && category !== "undefined" && category !== "null" ? category.trim() : null;
+      tags = tags && tags !== "undefined" && tags !== "null" ? tags : null;
+
       if (search) {
-        filter.$text = { $search: search };
+        filter.$text = {
+          $search: search
+        };
       }
       if (category) {
         filter.category = category.toLowerCase();
       }
       if (minPrice || maxPrice) {
         filter.price = {};
-        if (minPrice) filter.price.$gte = Number(minPrice);
-        if (maxPrice) filter.price.$lte = Number(maxPrice);
+        if (minPrice && minPrice !== "undefined") filter.price.$gte = Number(minPrice);
+        if (maxPrice && maxPrice !== "undefined") filter.price.$lte = Number(maxPrice);
       }
       if (tags) {
-        filter.tags = { $in: tags.split(',').map(t => t.trim().toLowerCase()) };
+        filter.tags = {
+          $in: tags.split(",").map(t => t.trim().toLowerCase())
+        };
       }
-      if (featured !== undefined) {
-        filter.featured = featured === 'true';
+      if (featured !== undefined && featured !== "undefined") {
+        filter.featured = featured === "true";
       }
-      if (isActive !== undefined) {
-        filter.isActive = isActive === 'true';
+      if (isActive !== undefined && isActive !== "undefined") {
+        filter.isActive = isActive === "true";
       }
 
+      // fetch products with category name only
       const products = await Product.find(filter)
+        .populate("category", "name") // only bring back category.name
         .skip((page - 1) * limit)
         .limit(Number(limit))
-        .sort({ createdAt: -1 });
+        .sort({
+          createdAt: -1
+        })
+        .lean(); // lean() gives plain JS objects
+
+      // transform category object -> just category.name
+      const transformed = products.map(p => ({
+        ...p,
+        category: p.category?.name || null,
+      }));
 
       const total = await Product.countDocuments(filter);
 
       res.json({
-        products,
+        products: transformed,
         total,
         page: Number(page),
         pages: Math.ceil(total / limit),
       });
     } catch (err) {
-      res.status(500).json({ error: 'Server error', details: err.message });
+      res.status(500).json({
+        error: "Server error",
+        details: err.message
+      });
     }
   }
+
 
   getByIdValidator = [
     param('id').isMongoId().withMessage('Invalid product ID'),
@@ -67,12 +96,19 @@ class ProductController {
   // GET /products/:id
   async getById(req, res) {
     try {
-      const { id } = req.params;
+      const {
+        id
+      } = req.params;
       const product = await Product.findById(id);
-      if (!product) return res.status(404).json({ error: 'Product not found' });
+      if (!product) return res.status(404).json({
+        error: 'Product not found'
+      });
       res.json(product);
     } catch (err) {
-      res.status(500).json({ error: 'Server error', details: err.message });
+      res.status(500).json({
+        error: 'Server error',
+        details: err.message
+      });
     }
   }
 
@@ -80,9 +116,13 @@ class ProductController {
   createValidator = [
     body('name').isString().trim().notEmpty().withMessage('Name is required'),
     body('description').isString().trim().notEmpty().withMessage('Description is required'),
-    body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+    body('price').isFloat({
+      min: 0
+    }).withMessage('Price must be a positive number'),
     body('category').isString().trim().notEmpty().withMessage('Category is required'),
-    body('stock').optional().isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
+    body('stock').optional().isInt({
+      min: 0
+    }).withMessage('Stock must be a non-negative integer'),
     body('tags').optional().isArray().withMessage('Tags must be an array'),
     body('featured').optional().isBoolean().withMessage('Featured must be a boolean'),
     body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
@@ -93,10 +133,14 @@ class ProductController {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          errors: errors.array()
+        });
       }
 
-      const productData = { ...req.body };
+      const productData = {
+        ...req.body
+      };
 
       // Handle images uploaded via multer
       if (req.files && req.files.length > 0) {
@@ -111,7 +155,7 @@ class ProductController {
 
       const product = new Product(productData);
       await product.save();
-      
+
       // Emit real-time notification to admins
       const io = req.app.get('io');
       if (io) {
@@ -121,10 +165,13 @@ class ProductController {
           createdAt: product.createdAt
         });
       }
-      
+
       res.status(201).json(product);
     } catch (err) {
-      res.status(500).json({ error: 'Server error', details: err.message });
+      res.status(500).json({
+        error: 'Server error',
+        details: err.message
+      });
     }
   }
 
@@ -133,9 +180,13 @@ class ProductController {
     param('id').isMongoId().withMessage('Invalid product ID'),
     body('name').isString().trim().notEmpty().withMessage('Name is required'),
     body('description').isString().trim().notEmpty().withMessage('Description is required'),
-    body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+    body('price').isFloat({
+      min: 0
+    }).withMessage('Price must be a positive number'),
     body('category').isString().trim().notEmpty().withMessage('Category is required'),
-    body('stock').optional().isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
+    body('stock').optional().isInt({
+      min: 0
+    }).withMessage('Stock must be a non-negative integer'),
     body('tags').optional().isArray().withMessage('Tags must be an array'),
     body('featured').optional().isBoolean().withMessage('Featured must be a boolean'),
     body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
@@ -144,13 +195,19 @@ class ProductController {
   // PUT /products/:id (admin only)
   async update(req, res) {
     try {
-      const { id } = req.params;
+      const {
+        id
+      } = req.params;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          errors: errors.array()
+        });
       }
 
-      const updateData = { ...req.body };
+      const updateData = {
+        ...req.body
+      };
 
       // Handle images uploaded via multer
       if (req.files && req.files.length > 0) {
@@ -161,9 +218,13 @@ class ProductController {
         }));
       }
 
-      const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
-      if (!product) return res.status(404).json({ error: 'Product not found' });
-      
+      const product = await Product.findByIdAndUpdate(id, updateData, {
+        new: true
+      });
+      if (!product) return res.status(404).json({
+        error: 'Product not found'
+      });
+
       // Check for low stock and emit notification
       const io = req.app.get('io');
       if (io && product.stock <= product.lowStockThreshold) {
@@ -174,24 +235,31 @@ class ProductController {
           threshold: product.lowStockThreshold
         });
       }
-      
+
       res.json(product);
     } catch (err) {
-      res.status(500).json({ error: 'Server error', details: err.message });
+      res.status(500).json({
+        error: 'Server error',
+        details: err.message
+      });
     }
   }
 
-// validator for deletion 
-   deleteValidator = [
+  // validator for deletion 
+  deleteValidator = [
     param('id').isMongoId().withMessage('Invalid product ID'),
   ]
   // DELETE /products/:id (admin only)
   async delete(req, res) {
     try {
-      const { id } = req.params;
+      const {
+        id
+      } = req.params;
       const product = await Product.findByIdAndDelete(id);
-      if (!product) return res.status(404).json({ error: 'Product not found' });
-      
+      if (!product) return res.status(404).json({
+        error: 'Product not found'
+      });
+
       // Emit real-time notification to admins
       const io = req.app.get('io');
       if (io) {
@@ -201,10 +269,15 @@ class ProductController {
           deletedAt: new Date()
         });
       }
-      
-      res.json({ message: 'Product deleted' });
+
+      res.json({
+        message: 'Product deleted'
+      });
     } catch (err) {
-      res.status(500).json({ error: 'Server error', details: err.message });
+      res.status(500).json({
+        error: 'Server error',
+        details: err.message
+      });
     }
   }
 }

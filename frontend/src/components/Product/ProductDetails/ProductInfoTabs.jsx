@@ -5,9 +5,9 @@ const ProductInfoTabs = ({ product }) => (
     <div className="info-item">
       <strong>Stock Status:</strong> In Stock
     </div>
-    <div className="info-item">
-      <strong>SKU:</strong> PROD-{product.id.toString().padStart(6, "0")}
-    </div>
+    {/* <div className="info-item">
+      <strong>SKU:</strong> PROD-{product.sku.toString().padStart(6, "0")}
+    </div> */}
     <div className="info-item">
       <strong>Category:</strong> {product.category}
     </div>

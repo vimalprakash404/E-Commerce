@@ -26,7 +26,6 @@ const productSchema = new mongoose.Schema({
     min: [0, 'Compare price cannot be negative']
   },
   category: {
-    type: String,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
     required: [true, 'Product category is required']
