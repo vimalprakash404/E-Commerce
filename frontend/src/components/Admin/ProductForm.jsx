@@ -13,7 +13,8 @@ const ProductForm = ({ product, onSave, onCancel }) => {
     brand: product?.brand || '',
     stock: product?.stock || '',
     lowStockThreshold: product?.lowStockThreshold || 10,
-    tags: product?.tags?.join(', ') || '',
+    // ✅ normalize tags to string for input field
+    tags: Array.isArray(product?.tags) ? product.tags.join(', ') : (product?.tags || ''),
     featured: product?.featured || false,
     isActive: product?.isActive !== undefined ? product.isActive : true,
   });
@@ -35,7 +36,6 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -72,7 +72,6 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
@@ -84,7 +83,6 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
     
     try {
@@ -92,17 +90,22 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       
       const formDataToSend = new FormData();
       
-      // Add form fields
       Object.keys(formData).forEach(key => {
         if (key === 'tags') {
-          const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-          formDataToSend.append(key, JSON.stringify(tagsArray));
+          const tagsArray = formData.tags
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag);
+          
+          // ✅ append each tag separately
+          tagsArray.forEach(tag => {
+            formDataToSend.append('tags', tag);
+          });
         } else {
           formDataToSend.append(key, formData[key]);
         }
       });
       
-      // Add images
       images.forEach(image => {
         if (image.isNew) {
           formDataToSend.append('images', image.file);

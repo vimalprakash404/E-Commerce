@@ -82,9 +82,7 @@ class orderController {
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
-            if (!req.user.isAdmin) {
-                return res.status(403).json({ message: "Forbidden" });
-            }
+            
             const orders = await order.find().sort({ createdAt: -1 });
             res.json(orders);
         } catch (err) {

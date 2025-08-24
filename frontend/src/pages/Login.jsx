@@ -10,6 +10,7 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const [userType, setUserType] = useState('customer'); // NEW
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -50,13 +51,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
-    
+
     if (Object.keys(newErrors).length === 0) {
       try {
         setIsLoading(true);
         setErrors({});
-        await login(formData);
-        navigate('/');
+        const res = await login(formData, userType); // get login response
+        // Check if user is admin and selected admin
+        if (
+          userType === 'admin' &&
+          res.user &&
+          Array.isArray(res.user.roles) &&
+          res.user.roles.includes('admin')
+        ) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } catch (error) {
         setErrors({ general: error.message });
       } finally {
@@ -78,6 +89,33 @@ const Login = () => {
             <h2>Welcome Back</h2>
             <p>Sign in to your account to continue shopping</p>
           </div>
+
+          {/* NEW: User type selection */}
+          <div className="form-group" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+            <label>
+              <input
+                type="radio"
+                name="userType"
+                value="customer"
+                checked={userType === 'customer'}
+                onChange={() => setUserType('customer')}
+                style={{ marginRight: '0.5rem' }}
+              />
+              Customer
+            </label>
+            <label style={{ marginLeft: '1.5rem' }}>
+              <input
+                type="radio"
+                name="userType"
+                value="admin"
+                checked={userType === 'admin'}
+                onChange={() => setUserType('admin')}
+                style={{ marginRight: '0.5rem' }}
+              />
+              Admin
+            </label>
+          </div>
+          {/* END NEW */}
 
           <form onSubmit={handleSubmit} className="auth-form">
             {errors.general && (

@@ -4,16 +4,19 @@ import apiService from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('authToken');
+  });
 
   useEffect(() => {
-    // Check if user is logged in on app start
     const token = localStorage.getItem('authToken');
     if (token) {
       apiService.setAuthToken(token);
-      // You might want to validate the token with the server here
       setIsAuthenticated(true);
     }
     setLoading(false);
@@ -22,8 +25,15 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials, userType = 'customer') => {
     try {
       const response = await apiService.login(credentials, userType);
+
+      // Save to state
       setUser(response.user);
       setIsAuthenticated(true);
+
+      // Save to localStorage
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+
       return response;
     } catch (error) {
       throw error;
@@ -42,13 +52,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await apiService.logout();
-      setUser(null);
-      setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
-      // Still clear local state even if server request fails
+    } finally {
+      // Clear state and localStorage
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
     }
   };
 
