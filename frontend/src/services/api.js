@@ -79,8 +79,19 @@ class ApiService {
 
   // Product endpoints
   async getProducts(params = {}) {
+    // Filter out undefined values
+    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    
+    console.log('API getProducts called with params:', cleanParams);
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/product${queryString ? `?${queryString}` : ''}`);
+    const url = `/product${queryString ? `?${queryString}` : ''}`;
+    console.log('Making request to:', url);
+    return this.request(url);
   }
 
   async getProduct(id) {

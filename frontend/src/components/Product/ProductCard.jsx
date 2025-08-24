@@ -4,25 +4,37 @@ import { useApp } from '../../context/AppContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-const ProductCard = ({ product }) => {
-  const { dispatch } = useCart();
+const ProductCard = ({ product, onViewProduct, onAddToCart }) => {
+  const { addToCart } = useCart();
   const {  setSelectedProduct } = useApp();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    dispatch({ type: 'ADD_TO_CART', product });
+    
+    if (onAddToCart) {
+      onAddToCart(product);
+    } else {
+      try {
+        await addToCart(product);
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+      }
+    }
   };
   
   const handleViewProduct = () => {
-    setSelectedProduct(product);
-    console.log("----------->",product);
-    navigate('/product-details');
+    if (onViewProduct) {
+      onViewProduct(product);
+    } else {
+      setSelectedProduct(product);
+      navigate('/product-details');
+    }
   };
   
   const renderStars = (rating) => {
@@ -62,7 +74,7 @@ const ProductCard = ({ product }) => {
         <div className="product-footer">
           <span className="product-price">₹{product.price.toFixed(2)}</span>
           <span className="product-stock">
-            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+            {(product.stock || 0) > 0 ? 'In Stock' : 'Out of Stock'}
           </span>
         </div>
       </div>

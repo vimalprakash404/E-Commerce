@@ -15,7 +15,9 @@ export const useProducts = (params = {}) => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching products with params:', searchParams);
       const response = await apiService.getProducts(searchParams);
+      console.log('Products response:', response);
       setProducts(response.products || []);
       setPagination({
         total: response.total || 0,
@@ -23,6 +25,7 @@ export const useProducts = (params = {}) => {
         pages: response.pages || 1,
       });
     } catch (err) {
+      console.error('Error fetching products:', err);
       setError(err.message);
       setProducts([]);
     } finally {
@@ -31,6 +34,7 @@ export const useProducts = (params = {}) => {
   };
 
   useEffect(() => {
+    console.log('useProducts effect triggered with params:', params);
     fetchProducts(params);
   }, []);
 
