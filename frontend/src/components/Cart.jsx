@@ -102,7 +102,7 @@ const Cart = () => {
                 </div>
                 
                 <div className="cart-item-details">
-                  <h3>{item.product?.name || item.name}</h3>
+                  <h3>{item.product?.name || item.name || 'Product Name'}</h3>
                   <p className="cart-item-price">₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
                 </div>
                 
@@ -129,7 +129,7 @@ const Cart = () => {
                 </div>
                 
                 <div className="cart-item-total">
-                  ${((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}
+                  ₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}
                 </div>
               </div>
             ))}

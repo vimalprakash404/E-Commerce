@@ -20,6 +20,10 @@ class cartController {
             }
 
             await cart.save();
+            
+            // Populate the cart with product details before sending response
+            await cart.populate('items.product');
+            
             res.status(200).json(cart);
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -38,6 +42,9 @@ class cartController {
             cart.items = cart.items.filter(item => item.product.toString() !== productId);
             await cart.save();
 
+            // Populate the cart with product details before sending response
+            await cart.populate('items.product');
+            
             res.status(200).json(cart);
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -54,6 +61,9 @@ class cartController {
             cart.items = [];
             await cart.save();
 
+            // Populate the cart with product details before sending response
+            await cart.populate('items.product');
+            
             res.status(200).json(cart);
         } catch (err) {
             res.status(500).json({ error: err.message });

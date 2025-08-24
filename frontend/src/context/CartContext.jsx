@@ -44,8 +44,10 @@ export const CartProvider = ({ children }) => {
 
     try {
       setError(null);
-      const response = await apiService.addToCart(product.id || product._id, 1);
+      const response = await apiService.addToCart(product._id || product.id, 1);
       setCart(response);
+      // Immediately fetch updated cart to ensure product details are populated
+      await fetchCart();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -60,6 +62,8 @@ export const CartProvider = ({ children }) => {
       setError(null);
       const response = await apiService.removeFromCart(productId);
       setCart(response);
+      // Fetch updated cart to ensure product details are populated
+      await fetchCart();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -77,6 +81,8 @@ export const CartProvider = ({ children }) => {
       // Add back with new quantity
       const response = await apiService.addToCart(productId, newQuantity);
       setCart(response);
+      // Fetch updated cart to ensure product details are populated
+      await fetchCart();
     } catch (err) {
       setError(err.message);
       throw err;
