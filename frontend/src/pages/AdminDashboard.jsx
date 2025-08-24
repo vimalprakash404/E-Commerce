@@ -166,7 +166,7 @@ const AdminDashboard = () => {
               <StatCard
                 icon={TrendingUp}
                 title="Total Revenue"
-                value={`$${stats.totalRevenue.toFixed(2)}`}
+                value={`₹${stats.totalRevenue.toFixed(2)}`}
                 color="purple"
               />
             </div>

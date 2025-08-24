@@ -23,7 +23,7 @@ const Bill = () => {
     city: '',
     state: '',
     pinCode: '',
-    country: 'United States'
+    country: ''
   });
 
   const [paymentInfo, setPaymentInfo] = useState({
@@ -222,7 +222,7 @@ const Bill = () => {
             <div className="order-summary">
               <h3>Order Summary</h3>
               <div className="order-summary-details">
-                <p><strong>Total Items:</strong> {getTotalItems()}</p>
+                {/* <p><strong>Total Items:</strong> {getTotalItems()}</p> */}
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Tax:</strong> ₹{tax.toFixed(2)}</p>
                 <p><strong>Shipping:</strong> {shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</p>

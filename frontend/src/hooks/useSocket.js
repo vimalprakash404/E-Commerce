@@ -10,7 +10,7 @@ export const useSocket = () => {
     if (isAuthenticated) {
       const token = localStorage.getItem('authToken');
       if (token) {
-        const newSocket = io('http://localhost:5000', {
+        const newSocket = io(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}`, {
           auth: {
             token: token
           }

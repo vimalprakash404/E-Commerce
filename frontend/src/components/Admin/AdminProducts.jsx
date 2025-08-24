@@ -102,7 +102,7 @@ const AdminProducts = () => {
     {
       header: 'Price',
       key: 'price',
-      render: (product) => `$${product.price.toFixed(2)}`
+      render: (product) => `₹${product.price.toFixed(2)}`
     },
     {
       header: 'Stock',

@@ -19,6 +19,7 @@ const AdminOrders = () => {
     try {
       setLoading(true);
       const response = await apiService.getAllOrders();
+      console.log('Fetched orders:', response);
       setOrders(response || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -91,7 +92,7 @@ const AdminOrders = () => {
     {
       header: 'Total',
       key: 'total',
-      render: (order) => `$${(order.totalPrice || 0).toFixed(2)}`
+      render: (order) => `₹${(order.totalPrice || 0).toFixed(2)}`
     },
     {
       header: 'Status',
@@ -174,18 +175,13 @@ const OrderDetailsModal = ({ order, onClose }) => {
         
         <div className="order-details-content">
           <div className="order-info-grid">
-            <div className="info-section">
-              <h4>Customer Information</h4>
-              <p><strong>Name:</strong> {order.user?.firstName} {order.user?.lastName}</p>
-              <p><strong>Email:</strong> {order.user?.email}</p>
-              <p><strong>Phone:</strong> {order.user?.phone || 'N/A'}</p>
-            </div>
+            
             
             <div className="info-section">
               <h4>Order Information</h4>
               <p><strong>Order Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
               <p><strong>Status:</strong> {order.status}</p>
-              <p><strong>Total:</strong> ${(order.totalPrice || 0).toFixed(2)}</p>
+              <p><strong>Total:</strong> ₹{(order.totalPrice || 0).toFixed(2)}</p>
             </div>
           </div>
           
@@ -207,6 +203,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
           
           <div className="info-section">
             <h4>Order Items</h4>
+            
             <div className="order-items-list">
               {order.items.map((item, index) => (
                 <div key={index} className="order-item-row">
@@ -223,7 +220,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <p><strong>Phone:</strong> {order.user?.phone || order.address?.phone || 'N/A'}</p>
                   </div>
                   <div className="item-total">
-                    ${((item.product?.price || 0) * item.quantity).toFixed(2)}
+                    ₹{((item.product?.price || 0) * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}

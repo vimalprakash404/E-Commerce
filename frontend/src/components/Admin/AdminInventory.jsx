@@ -124,7 +124,7 @@ const AdminInventory = () => {
     {
       header: 'Value',
       key: 'value',
-      render: (product) => `$${(product.price * product.stock).toFixed(2)}`
+      render: (product) => `₹${(product.price * product.stock).toFixed(2)}`
     }
   ];
 
@@ -182,7 +182,7 @@ const AdminInventory = () => {
             <Package size={24} />
           </div>
           <div className="stat-content">
-            <h3>${stockStats.totalValue.toFixed(2)}</h3>
+            <h3>₹{stockStats.totalValue.toFixed(2)}</h3>
             <p>Total Value</p>
           </div>
         </div>
