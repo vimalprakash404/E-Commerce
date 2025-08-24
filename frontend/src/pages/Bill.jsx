@@ -36,7 +36,7 @@ const Bill = () => {
 
   const subtotal = getTotalPrice();
   const tax = subtotal * 0.08;
-  const shipping = subtotal > 50 ? 0 : 9.99;
+  const shipping = subtotal > 50 ? 0 : 5.99;
   const total = subtotal + tax + shipping;
 
   // Frontend validation
@@ -86,9 +86,9 @@ const Bill = () => {
     }
     
     if (!billingInfo.pinCode.trim()) {
-      errors.pinCode = 'Pin codeis required';
+      errors.pinCode = 'Pin code is required';
     } else if (!/^\d{5}(-\d{4})?$/.test(billingInfo.pinCode)) {
-      errors.pinCode = 'Please enter a valid Pin code(e.g., 12345 or 12345-6789)';
+      errors.pinCode = 'Please enter a valid Pin code (e.g., 12345 or 12345-6789)';
     }
     
     if (!billingInfo.country.trim()) {
@@ -222,16 +222,16 @@ const Bill = () => {
             <div className="order-summary">
               <h3>Order Summary</h3>
               <div className="order-summary-details">
-                <p><strong>Items:</strong> {items.length}</p>
+                <p><strong>Total Items:</strong> {getTotalItems()}</p>
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Tax:</strong> ₹{tax.toFixed(2)}</p>
                 <p><strong>Shipping:</strong> {shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</p>
                 <p><strong>Total:</strong> ₹{total.toFixed(2)}</p>
               </div>
-              <p>You will receive a confirmation email shortly.</p>
+              <p>A confirmation email has been sent to {billingInfo.email}</p>
             </div>
             <div className="success-actions">
-              <button className="btn btn-primary" onClick={() => navigate('/orders')}>
+              <button className="btn btn-primary" onClick={() => navigate('/order')}>
                 View Orders
               </button>
               <button className="btn btn-secondary" onClick={() => navigate('/')}>
@@ -493,15 +493,16 @@ const Bill = () => {
                   {items.map(item => (
                     <div key={item.id} className="review-item">
                       <img 
-                        src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=200'} 
-                        alt={item.product?.name || item.name || 'Product'} 
+                        src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=300'} 
+                        alt={item.product?.name || item.name} 
                       />
                       <div className="item-details">
-                        <h4>{item.product?.name || item.name || 'Product Name'}</h4>
-                        <p className="item-category">{item.product?.category || 'Uncategorized'}</p>
-                        <p>Quantity: {item.quantity}</p>
-                        <p>Unit Price: ₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
-                        <p className="item-price">₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</p>
+                        <h4>{item.product?.name || item.name}</h4>
+                        <p className="item-category">Category: {item.product?.category?.name || item.product?.category || 'General'}</p>
+                        <div className="item-pricing">
+                          <p>Qty: {item.quantity} × ₹{(item.product?.price || item.price || 0).toFixed(2)}</p>
+                          <p className="item-total"><strong>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</strong></p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -511,11 +512,11 @@ const Bill = () => {
                   <div className="billing-address">
                     <h4>Billing Address</h4>
                     <p>{billingInfo.firstName} {billingInfo.lastName}</p>
+                    <p>{billingInfo.email}</p>
+                    <p>{billingInfo.phone}</p>
                     <p>{billingInfo.street}</p>
                     <p>{billingInfo.city}, {billingInfo.state} {billingInfo.pinCode}</p>
                     <p>{billingInfo.country}</p>
-                    <p>{billingInfo.email}</p>
-                    <p>{billingInfo.phone}</p>
                   </div>
                 </div>
               </div>
@@ -561,11 +562,21 @@ const Bill = () => {
             <div className="summary-items">
               {items.map(item => (
                 <div key={item.id} className="summary-item">
+                  <img 
+                    src={item.product?.images?.[0]?.url || item.product?.image || item.image || 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=60'} 
+                    alt={item.product?.name || item.name}
+                    className="summary-item-image"
+                  />
                   <div className="summary-item-details">
-                    <span className="item-name">{item.product?.name || item.name}</span>
-                    <span className="item-quantity">Qty: {item.quantity}</span>
+                    <div className="item-name">{item.product?.name || item.name}</div>
+                    <div className="item-meta">
+                      <span className="item-quantity">Qty: {item.quantity}</span>
+                      <span className="item-unit-price">₹{(item.product?.price || item.price || 0).toFixed(2)} each</span>
+                    </div>
                   </div>
-                  <span>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</span>
+                  <div className="summary-item-total">
+                    <strong>₹{((item.product?.price || item.price || 0) * item.quantity).toFixed(2)}</strong>
+                  </div>
                 </div>
               ))}
             </div>
@@ -577,7 +588,7 @@ const Bill = () => {
               </div>
               <div className="summary-line">
                 <span>Shipping:</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span>
               </div>
               <div className="summary-line">
                 <span>Tax:</span>
