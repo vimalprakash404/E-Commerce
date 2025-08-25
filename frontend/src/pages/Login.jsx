@@ -107,6 +107,7 @@ const Login = () => {
                 className={`toggle-btn ${userType === 'admin' ? 'active' : ''}`}
                 onClick={() => setUserType('admin')}
               >
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 <User size={16} />
                 Admin
               </button>
