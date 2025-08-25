@@ -95,6 +95,8 @@ A full-stack e-commerce application built with React.js and Node.js, featuring u
    PORT=5000
    MONGO_URI=mongodb://localhost:27017/ecommerce
    JWT_SECRET=your_jwt_secret_key_here
+   JWT_EXPIRES_IN=7d
+   CORS_ORIGIN=http://localhost:5173
    NODE_ENV=development
    ```
 
@@ -103,6 +105,32 @@ A full-stack e-commerce application built with React.js and Node.js, featuring u
    ```env
    VITE_API_BASE_URL=http://localhost:5000
    ```
+
+### Configuration Setup
+
+The server includes a configuration file (`server/src/config/config.js`) that manages all application settings. You can customize the following:
+
+1. **Database Settings**
+   - MongoDB connection string
+   - Connection options
+
+2. **Authentication Settings**
+   - JWT secret key
+   - Token expiration time
+
+3. **File Upload Settings**
+   - Maximum file size (default: 5MB)
+   - Allowed file types
+   - Image dimensions limits
+
+4. **Default Accounts**
+   - Admin credentials
+   - Sample customer credentials
+
+5. **Server Settings**
+   - Port configuration
+   - CORS origins
+   - Pagination limits
 
 ### How to Run the Application
 
@@ -166,17 +194,17 @@ A full-stack e-commerce application built with React.js and Node.js, featuring u
 
 ## Test Accounts
 
-### Admin Account
-- **Email**: admin@example.com
-- **Password**: admin123
+### Default Admin Account
+- **Email**: admin@ecommerce.com
+- **Password**: Admin@123
 - **Role**: Admin
 
-### Sample Customer Account
-- **Email**: customer@example.com
-- **Password**: customer123
+### Default Customer Account
+- **Email**: customer@ecommerce.com
+- **Password**: Customer@123
 - **Role**: Customer
 
-*Note: You'll need to create these accounts through the registration process or directly in the database.*
+*Note: These are the default credentials defined in the config file. You can create additional accounts through the registration process.*
 
 ## Assumptions Made
 

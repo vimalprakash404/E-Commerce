@@ -6,6 +6,7 @@ const socketIo = require('socket.io');
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
+const config = require('./src/config/config');
 
 // connecting db 
 require("./src/db/mongo")
@@ -14,14 +15,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: config.CORS_ORIGIN,
     methods: ["GET", "POST"]
   }
 });
 
 // CORS configuration
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite dev server
+  origin: config.CORS_ORIGIN,
   credentials: true
 }));
 
@@ -67,8 +68,8 @@ require('./src/socket/socketHandler')(io);
 
 // ---------------------- START SERVER ---------------------- //
 
-server.listen(process.env.PORT || 5000, () =>
-  console.log(`🚀 Server running on port ${process.env.PORT || 5000}`)
+server.listen(config.PORT, () =>
+  console.log(`🚀 Server running on port ${config.PORT}`)
 );
 
 module.exports = { app, io };

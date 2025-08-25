@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const config = require('../config/config');
 
 class AuthMiddleware {
   // JWT authentication middleware
@@ -10,7 +11,7 @@ class AuthMiddleware {
     }
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+      const decoded = jwt.verify(token, config.JWT_SECRET);
       const user = await User.findById(decoded.userId);
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });

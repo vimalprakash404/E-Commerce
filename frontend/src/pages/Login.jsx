@@ -91,29 +91,26 @@ const Login = () => {
           </div>
 
           {/* NEW: User type selection */}
-          <div className="form-group" style={{ marginBottom: '1rem', textAlign: 'center' }}>
-            <label>
-              <input
-                type="radio"
-                name="userType"
-                value="customer"
-                checked={userType === 'customer'}
-                onChange={() => setUserType('customer')}
-                style={{ marginRight: '0.5rem' }}
-              />
-              Customer
-            </label>
-            <label style={{ marginLeft: '1.5rem' }}>
-              <input
-                type="radio"
-                name="userType"
-                value="admin"
-                checked={userType === 'admin'}
-                onChange={() => setUserType('admin')}
-                style={{ marginRight: '0.5rem' }}
-              />
-              Admin
-            </label>
+          <div className="user-type-toggle">
+            <label className="toggle-label">Login as:</label>
+            <div className="toggle-container">
+              <button
+                type="button"
+                className={`toggle-btn ${userType === 'customer' ? 'active' : ''}`}
+                onClick={() => setUserType('customer')}
+              >
+                <User size={16} />
+                Customer
+              </button>
+              <button
+                type="button"
+                className={`toggle-btn ${userType === 'admin' ? 'active' : ''}`}
+                onClick={() => setUserType('admin')}
+              >
+                <User size={16} />
+                Admin
+              </button>
+            </div>
           </div>
           {/* END NEW */}
 

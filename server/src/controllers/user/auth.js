@@ -5,6 +5,7 @@ const {
 } = require('express-validator');
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
+const config = require('../../config/config');
 
 class AuthController {
 
@@ -152,8 +153,8 @@ class AuthController {
                 userId: user._id,
                 roles: user.roles
             },
-            process.env.JWT_SECRET || 'your_jwt_secret', {
-                expiresIn: '1d'
+            config.JWT_SECRET, {
+                expiresIn: config.JWT_EXPIRES_IN
             }
         );
 

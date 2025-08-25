@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const config = require('../config/config');
 
 module.exports = (io) => {
   // Middleware for socket authentication
@@ -10,7 +11,7 @@ module.exports = (io) => {
         return next(new Error('Authentication error'));
       }
       
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+      const decoded = jwt.verify(token, config.JWT_SECRET);
       const user = await User.findById(decoded.userId);
       
       if (!user) {
