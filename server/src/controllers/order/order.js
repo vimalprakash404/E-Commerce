@@ -54,61 +54,105 @@ class orderController {
             }
 
             await cart.updateOne({ user: userId }, { $set: { items: [], total: 0 } });
-            res.status(201).json(newOrder);
+
+            // return populated order
+            const populatedOrder = await order.findById(newOrder._id)
+                .populate({
+                    path: "items.product",
+                    select: "name price category",
+                    populate: { path: "category", select: "name" }
+                })
+                .lean();
+
+            // transform category → just category.name
+            const transformed = {
+                ...populatedOrder,
+                items: populatedOrder.items.map(it => ({
+                    ...it,
+                    product: {
+                        ...it.product,
+                        category: it.product?.category?.name || null
+                    }
+                }))
+            };
+
+            res.status(201).json(transformed);
         } catch (err) {
             res.status(500).json({ message: "Server error", error: err.message });
         }
     }
 
-    // GET /orders/user → user’s past orders
     async getUserOrders(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            const userId = req.user._id;
-            const orders = await order.find({ user: userId }).sort({ createdAt: -1 });
-            res.json(orders);
-        } catch (err) {
-            res.status(500).json({ message: "Server error", error: err.message });
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
         }
-    }
+        const userId = req.user._id;
+        const orders = await order
+            .find({ user: userId })
+            .populate("items.product") // populate product details
+            .populate("user", "firstName lastName email phone") // populate user fields
+            .sort({ createdAt: -1 });
 
-    // GET /orders/admin → admin fetch all orders
-    async getAllOrders(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            
-            const orders = await order.find().sort({ createdAt: -1 });
-            res.json(orders);
-        } catch (err) {
-            res.status(500).json({ message: "Server error", error: err.message });
-        }
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
     }
+}
+
+// GET /orders/admin → admin fetch all orders
+async getAllOrders(req, res) {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        
+        const orders = await order
+            .find()
+            .populate("items.product") // populate products
+            .populate("user", "firstName lastName email phone") // populate user details
+            .sort({ createdAt: -1 });
+
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+}
 
     // PUT /orders/:id → admin update order status
     async updateOrderStatus(req, res) {
         try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
-            
             const { id } = req.params;
             const { status } = req.body;
             const updatedOrder = await order.findByIdAndUpdate(
                 id,
                 { status },
                 { new: true }
-            );
+            )
+            .populate({
+                path: "items.product",
+                select: "name price category",
+                populate: { path: "category", select: "name" }
+            })
+            .lean();
+
             if (!updatedOrder) {
                 return res.status(404).json({ message: "Order not found" });
             }
-            
+
+            const transformed = {
+                ...updatedOrder,
+                items: updatedOrder.items.map(it => ({
+                    ...it,
+                    product: {
+                        ...it.product,
+                        category: it.product?.category?.name || null
+                    }
+                }))
+            };
+
             // Emit real-time notification
             const io = req.app.get('io');
             if (io) {
@@ -118,7 +162,6 @@ class orderController {
                     updatedAt: new Date()
                 });
                 
-                // Notify the customer
                 io.to(`user_${updatedOrder.user}`).emit('order_status_changed', {
                     orderId: updatedOrder._id,
                     status: updatedOrder.status,
@@ -126,73 +169,32 @@ class orderController {
                 });
             }
             
-            res.json(updatedOrder);
+            res.json(transformed);
         } catch (err) {
             res.status(500).json({ message: "Server error", error: err.message });
         }
     }
 
-    // Validators for each endpoint
- placeOrderValidator = [
-    body("address").isObject().withMessage("Address must be an object"),
-    body("address.firstName")
-        .notEmpty()
-        .withMessage("First name is required")
-        .isLength({ max: 50 })
-        .withMessage("First name cannot exceed 50 characters")
-        .trim(),
-    body("address.lastName")
-        .notEmpty()
-        .withMessage("Last name is required")
-        .isLength({ max: 50 })
-        .withMessage("Last name cannot exceed 50 characters")
-        .trim(),
-    body("address.email")
-        .isEmail()
-        .withMessage("Please enter a valid email")
-        .normalizeEmail(),
-    body("address.phone")
-        .notEmpty()
-        .withMessage("Phone number is required")
-        .matches(/^\+?[\d\s-()]+$/)
-        .withMessage("Please enter a valid phone number"),
-    body("address.street")
-        .notEmpty()
-        .withMessage("Street address is required")
-        .isLength({ max: 200 })
-        .withMessage("Street address cannot exceed 200 characters")
-        .trim(),
-    body("address.city")
-        .notEmpty()
-        .withMessage("City is required")
-        .isLength({ max: 50 })
-        .withMessage("City cannot exceed 50 characters")
-        .trim(),
-    body("address.state")
-        .notEmpty()
-        .withMessage("State is required")
-        .isLength({ max: 50 })
-        .withMessage("State cannot exceed 50 characters")
-        .trim(),
-    body("address.zipCode")
-        .notEmpty()
-        .withMessage("ZIP code is required")
-        .matches(/^\d{5}(-\d{4})?$/)
-        .withMessage("Please enter a valid ZIP code (e.g., 12345 or 12345-6789)"),
-    body("address.country")
-        .notEmpty()
-        .withMessage("Country is required")
-        .trim()
-];
+    // Validators
+    placeOrderValidator = [
+        body("address").isObject().withMessage("Address must be an object"),
+        body("address.firstName").notEmpty().withMessage("First name is required").isLength({ max: 50 }).trim(),
+        body("address.lastName").notEmpty().withMessage("Last name is required").isLength({ max: 50 }).trim(),
+        body("address.email").isEmail().withMessage("Please enter a valid email").normalizeEmail(),
+        body("address.phone").notEmpty().withMessage("Phone number is required")
+            .matches(/^\+?[\d\s-()]+$/).withMessage("Please enter a valid phone number"),
+        body("address.street").notEmpty().withMessage("Street address is required").isLength({ max: 200 }).trim(),
+        body("address.city").notEmpty().withMessage("City is required").isLength({ max: 50 }).trim(),
+        body("address.state").notEmpty().withMessage("State is required").isLength({ max: 50 }).trim(),
+        body("address.zipCode").notEmpty().withMessage("ZIP code is required")
+            .matches(/^\d{5}(-\d{4})?$/).withMessage("Please enter a valid ZIP code"),
+        body("address.country").notEmpty().withMessage("Country is required").trim()
+    ];
 
-
-
- updateOrderStatusValidator = [
-    param("id").isMongoId().withMessage("Invalid order ID"),
-    body("status").isString().notEmpty().withMessage("Status is required")
-];
+    updateOrderStatusValidator = [
+        param("id").isMongoId().withMessage("Invalid order ID"),
+        body("status").isString().notEmpty().withMessage("Status is required")
+    ];
 }
-
-
 
 module.exports = new orderController();

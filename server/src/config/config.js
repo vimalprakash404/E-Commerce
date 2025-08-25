@@ -30,7 +30,7 @@ const config = {
   
   // Admin Configuration
   DEFAULT_ADMIN: {
-    email: 'admin@ecommerce.com',
+    email: 'admin@example.com',
     password: 'Admin@123',
     firstName: 'Admin',
     lastName: 'User',
@@ -39,7 +39,7 @@ const config = {
   
   // Sample Customer
   DEFAULT_CUSTOMER: {
-    email: 'customer@ecommerce.com',
+    email: 'customer@example.com',
     password: 'Customer@123',
     firstName: 'John',
     lastName: 'Doe',

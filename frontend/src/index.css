@@ -2243,7 +2243,7 @@ input:focus,
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: #2e6aca;
   margin-bottom: 0.5rem;
 }
 
@@ -2269,43 +2269,45 @@ input:focus,
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: #6b7280;
+  color: #2563eb;
 }
 
 .toggle-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  
+  border-color: #2563eb;
+  color: #2563eb;
+ 
 }
 
 .toggle-btn.active {
-  background: #ffffff;
-  color: #1f2937;
+  border-color: #2563eb;
+  color: #2563eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
 .toggle-btn.active:hover {
-  background: #ffffff;
-  color: #1f2937;
+border-color: #2563eb;
+  color: #2563eb;
 }
 
 /* Dark mode support for toggle */
 @media (prefers-color-scheme: dark) {
   .toggle-container {
-    background: #374151;
+    background: #1f71f5;
   }
   
   .toggle-btn {
-    color: #9ca3af;
+    color: #6495eb;
   }
   
   .toggle-btn:hover {
-    background: #4b5563;
+    background: #183f75;
     color: #d1d5db;
   }
   
   .toggle-btn.active {
-    background: #1f2937;
+    background: #3b8aff;
     color: #f9fafb;
   }
   
