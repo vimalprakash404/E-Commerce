@@ -71,18 +71,20 @@ A full-stack e-commerce application built with React.js and Node.js, featuring u
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd ecommerce-platform
+   git clone https://github.com/vimalprakash404/E-Commerce.git
+   cd E-Commerce
    ```
 
 2. **Install Backend Dependencies**
    ```bash
    cd server
+   npm i
    npm install
    ```
 
 3. **Install Frontend Dependencies**
    ```bash
+   napm i
    cd ../frontend
    npm install
    ```
@@ -195,12 +197,12 @@ The server includes a configuration file (`server/src/config/config.js`) that ma
 ## Test Accounts
 
 ### Default Admin Account
-- **Email**: admin@ecommerce.com
+- **Email**: admin@example.com
 - **Password**: Admin@123
 - **Role**: Admin
 
 ### Default Customer Account
-- **Email**: customer@ecommerce.com
+- **Email**: customer@example.com
 - **Password**: Customer@123
 - **Role**: Customer
 

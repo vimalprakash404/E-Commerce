@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-section">
-          <h3>ShopHub</h3>
+          <h3>Texol</h3>
           <p>Your one-stop destination for quality products at great prices. We're committed to providing exceptional shopping experiences.</p>
           <div className="social-links">
             <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
@@ -42,7 +42,7 @@ const Footer = () => {
           <div className="contact-info">
             <div className="contact-item">
               <Mail size={16} />
-              <span>support@shophub.com</span>
+              <span>support@example.com</span>
             </div>
             <div className="contact-item">
               <Phone size={16} />
@@ -57,7 +57,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; 2024 ShopHub. All rights reserved.</p>
+        <p>&copy; 2024 Example. All rights reserved.</p>
       </div>
     </footer>
   );
