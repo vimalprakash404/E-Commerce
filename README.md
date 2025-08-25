@@ -84,7 +84,7 @@ A full-stack e-commerce application built with React.js and Node.js, featuring u
 
 3. **Install Frontend Dependencies**
    ```bash
-   napm i
+   npm i
    cd ../frontend
    npm install
    ```
