@@ -27,7 +27,7 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
-    const url = `${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     const config = {
       headers: this.getAuthHeaders(),
       ...options,
