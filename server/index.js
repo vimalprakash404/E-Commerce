@@ -29,11 +29,7 @@ app.set('io', io);
 require('./src/socket/socketHandler')(io);
 
 // ---------------------- MIDDLEWARE ---------------------- //
-app.use(cors({
-  origin: "*", // allow all origins, change to your frontend in production
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
