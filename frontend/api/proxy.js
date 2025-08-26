@@ -1,26 +1,23 @@
+// /api/proxy.js
 import fetch from "node-fetch";
 
 export default async function handler(req, res) {
   try {
-    // Read from environment variable
-    const baseUrl = "http://15.206.92.180:3000/"
-
+    const baseUrl = process.env.VITE_API_BASE_URL; // from Vercel env
     if (!baseUrl) {
       return res.status(500).json({ error: "VITE_API_BASE_URL not set" });
     }
 
-    // Build target URL (strip `/api/proxy` from req.url)
+    // Remove /api/proxy prefix
     const targetPath = req.url.replace(/^\/api\/proxy/, "");
     const backendUrl = `${baseUrl}${targetPath}`;
 
-    // Forward request
     const backendRes = await fetch(backendUrl, {
       method: req.method,
-      headers: { ...req.headers, host: undefined }, // avoid host mismatch
+      headers: { ...req.headers, host: undefined },
       body: req.method !== "GET" && req.method !== "HEAD" ? req.body : undefined,
     });
 
-    // Forward response
     const data = await backendRes.text();
     res.status(backendRes.status).send(data);
   } catch (err) {
