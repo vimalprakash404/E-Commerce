@@ -31,6 +31,11 @@ require('./src/socket/socketHandler')(io);
 // ---------------------- MIDDLEWARE ---------------------- //
 app.use(cors());
 
+app.use((req, res, next) => {
+  res.removeHeader('Referrer-Policy'); // removes the header
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
