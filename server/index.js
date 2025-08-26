@@ -26,6 +26,11 @@ app.use(cors({
   credentials: true
 }));
 
+app.use((req, res, next) => {
+  res.setHeader('Referrer-Policy', 'no-referrer'); // or "" for empty
+  next();
+});
+
 app.use(express.json());
 app.use(cors());
 app.use("/api", require("./src/routers"));
