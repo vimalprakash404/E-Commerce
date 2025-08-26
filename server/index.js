@@ -15,15 +15,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: config.CORS_ORIGIN,
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
 
 // CORS configuration
 app.use(cors({
-  origin: config.CORS_ORIGIN,
-  credentials: true
+  origin: "*",  // allow all origins
 }));
 
 app.use(express.json());
