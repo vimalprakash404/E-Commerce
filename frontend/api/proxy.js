@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 export default async function handler(req, res) {
   try {
     // Read from environment variable
-    const baseUrl = process.env.VITE_API_BASE_URL;
+    const baseUrl = "http://15.206.92.180:3000/"
 
     if (!baseUrl) {
       return res.status(500).json({ error: "VITE_API_BASE_URL not set" });
