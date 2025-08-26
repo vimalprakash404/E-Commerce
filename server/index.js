@@ -8,23 +8,24 @@ const path = require("path");
 const multer = require("multer");
 const config = require('./src/config/config');
 
-// Connecting DB
+// ---------------------- DATABASE ---------------------- //
 require("./src/db/mongo");
 
+// ---------------------- APP & SERVER ---------------------- //
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*", // allow all origins (for testing)
+    origin: "*", // change to frontend URL in production
     methods: ["GET", "POST"]
   }
 });
 
 // ---------------------- MIDDLEWARE ---------------------- //
-app.use(cors());
+app.use(cors()); // Allow all origins (change for production)
 app.use(express.json());
 
-// Referrer-Policy: remove default behavior
+// Remove default referrer policy
 app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'no-referrer');
   next();
@@ -37,13 +38,13 @@ app.use("/api", require("./src/routers"));
 const uploadsDir = path.join(__dirname, "uploads");
 
 // Ensure uploads folder exists
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, uploadsDir);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, Date.now() + "_" + file.originalname);
   }
 });
@@ -75,15 +76,22 @@ app.get("/uploads", (req, res) => {
 });
 
 // Serve uploaded files
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadsDir));
 
 // ---------------------- SOCKET.IO ---------------------- //
 app.set('io', io);
 require('./src/socket/socketHandler')(io);
 
+// ---------------------- SPA FALLBACK ---------------------- //
+
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.use('/*\w', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 // ---------------------- START SERVER ---------------------- //
-server.listen(config.PORT, () =>
-  console.log(`🚀 Server running on port ${config.PORT}`)
-);
+server.listen(config.PORT, () => {
+  console.log(`🚀 Server running on port ${config.PORT}`);
+});
 
 module.exports = { app, io };
