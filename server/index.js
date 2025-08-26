@@ -8,52 +8,63 @@ const path = require("path");
 const multer = require("multer");
 const config = require('./src/config/config');
 
-// connecting db 
-require("./src/db/mongo")
+// Connecting DB
+require("./src/db/mongo");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: config.CORS_ORIGIN,
+    origin: "*", // allow all origins (for testing)
     methods: ["GET", "POST"]
   }
 });
 
-// CORS configuration
-app.use(cors({
-  origin: config.CORS_ORIGIN,
-  credentials: true
-}));
+// ---------------------- MIDDLEWARE ---------------------- //
+app.use(cors());
+app.use(express.json());
 
+// Referrer-Policy: remove default behavior
 app.use((req, res, next) => {
-  res.setHeader('Referrer-Policy', 'no-referrer'); // or "" for empty
+  res.setHeader('Referrer-Policy', 'no-referrer');
   next();
 });
 
-app.use(express.json());
-app.use(cors());
+// ---------------------- ROUTERS ---------------------- //
 app.use("/api", require("./src/routers"));
 
-// ---------------------- FILE UPLOAD HANDLING ---------------------- //
+// ---------------------- FILE UPLOAD ---------------------- //
+const uploadsDir = path.join(__dirname, "uploads");
 
-// Storage config for multer
+// Ensure uploads folder exists
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "_" + file.originalname);
+  }
+});
 
+const upload = multer({ storage });
 
-// Serve uploaded files
-app.use('/uploads', express.static('uploads'));
-
-// Route: upload a file
-
-
-// Route: list uploaded files
-app.get("/uploads", (req, res) => {
-  const uploadsDir = path.join(__dirname, "uploads");
-  fs.readdir(uploadsDir, (err, files) => {
-    if (err) {
-      return res.status(500).json({ error: "Unable to scan uploads directory" });
+// Upload route
+app.post("/upload", upload.single("file"), (req, res) => {
+  res.json({
+    message: "File uploaded successfully",
+    file: {
+      name: req.file.filename,
+      url: `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
     }
+  });
+});
+
+// List uploaded files
+app.get("/uploads", (req, res) => {
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) return res.status(500).json({ error: "Unable to scan uploads directory" });
     res.json({
       files: files.map(file => ({
         name: file,
@@ -63,16 +74,14 @@ app.get("/uploads", (req, res) => {
   });
 });
 
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 // ---------------------- SOCKET.IO ---------------------- //
-
-// Make io available to routes
 app.set('io', io);
-
-// Socket.IO connection handling
 require('./src/socket/socketHandler')(io);
 
 // ---------------------- START SERVER ---------------------- //
-
 server.listen(config.PORT, () =>
   console.log(`🚀 Server running on port ${config.PORT}`)
 );
