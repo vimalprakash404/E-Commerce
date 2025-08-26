@@ -38,6 +38,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add this before your routes
+app.use((req, res, next) => {
+  res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade'); 
+  // other options: 'origin', 'unsafe-url', 'same-origin'
+  next();
+});
+
 // ---------------------- ROUTES ---------------------- //
 app.use("/api", require("./src/routers"));
 
