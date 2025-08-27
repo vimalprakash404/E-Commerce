@@ -1,8 +1,10 @@
 import { ArrowRight, ShoppingBag } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+
+import { useNavigate } from "react-router-dom";
 
 export default function HeroText() {
-  const { setCurrentView } = useApp();
+  const navigation = useNavigate();
+  
 
   return (
     <div className="hero-text">
@@ -14,13 +16,13 @@ export default function HeroText() {
       <div className="hero-actions">
         <button
           className="btn btn-primary"
-          onClick={() => setCurrentView("products")}
+          onClick={() => navigation("/products")}
         >
           <ShoppingBag size={20} />
           Shop Now
           <ArrowRight size={16} />
         </button>
-        <button className="btn btn-secondary">Learn More</button>
+       
       </div>
     </div>
   );
