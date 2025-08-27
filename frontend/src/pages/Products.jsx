@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext.jsx';
 import { useApp } from '../context/AppContext.jsx';
@@ -11,12 +12,21 @@ const ProductList = () => {
   const { addToCart } = useCart();
   const { setSelectedProduct } = useApp();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Get category from URL params on component mount
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+    }
+  }, [searchParams]);
 
   const { products, loading, error, refetch } = useProducts({
     search: searchQuery || undefined,

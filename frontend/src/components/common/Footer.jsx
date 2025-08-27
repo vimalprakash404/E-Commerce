@@ -1,7 +1,36 @@
 
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api';
 
 const Footer = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getCategories({ limit: 6 }); // Limit to 6 categories for footer
+        setCategories(response || []);
+      } catch (error) {
+        console.error('Error fetching categories for footer:', error);
+        // Fallback to empty array if API fails
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = (categorySlug) => {
+    navigate(`/products?category=${categorySlug}`);
+  };
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -28,13 +57,28 @@ const Footer = () => {
         
         <div className="footer-section">
           <h4>Categories</h4>
-          <ul>
-            <li><a href="#">Electronics</a></li>
-            <li><a href="#">Clothing</a></li>
-            <li><a href="#">Home & Garden</a></li>
-            <li><a href="#">Sports</a></li>
-            <li><a href="#">Books</a></li>
-          </ul>
+          {loading ? (
+            <ul>
+              <li>Loading categories...</li>
+            </ul>
+          ) : (
+            <ul>
+              {categories.length > 0 ? (
+                categories.map((category) => (
+                  <li key={category._id}>
+                    <button 
+                      onClick={() => handleCategoryClick(category.slug)}
+                      className="footer-category-link"
+                    >
+                      {category.name}
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <li>No categories available</li>
+              )}
+            </ul>
+          )}
         </div>
         
         <div className="footer-section">

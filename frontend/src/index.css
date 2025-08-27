@@ -2663,6 +2663,21 @@ body {
   color: #9ca3af;
 }
 
+.footer-category-link {
+  background: none;
+  border: none;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+
+.footer-category-link:hover {
+  color: #3b82f6;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-container {
