@@ -2,12 +2,14 @@
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api';
 
 const Footer = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -31,12 +33,63 @@ const Footer = () => {
     navigate(`/products?category=${categorySlug}`);
   };
 
+  // Dynamic quick links based on authentication status
+  const getQuickLinks = () => {
+    const baseLinks = [
+      { label: 'Home', path: '/', show: true },
+      { label: 'Products', path: '/products', show: true },
+      { label: 'About Us', path: '/about', show: true },
+      { label: 'Contact', path: '/contact', show: true },
+    ];
+
+    const authLinks = [
+      { label: 'My Orders', path: '/order', show: isAuthenticated },
+      { label: 'My Cart', path: '/cart', show: isAuthenticated },
+      { label: 'Profile', path: '/profile', show: isAuthenticated },
+    ];
+
+    const adminLinks = [
+      { label: 'Admin Dashboard', path: '/admin', show: isAuthenticated && user?.roles?.includes('admin') },
+    ];
+
+    const guestLinks = [
+      { label: 'Login', path: '/login', show: !isAuthenticated },
+      { label: 'Sign Up', path: '/signup', show: !isAuthenticated },
+    ];
+
+    return [...baseLinks, ...authLinks, ...adminLinks, ...guestLinks].filter(link => link.show);
+  };
+
+  // Dynamic support links
+  const getSupportLinks = () => {
+    return [
+      { label: 'Help Center', path: '/help', show: true },
+      { label: 'FAQs', path: '/faq', show: true },
+      { label: 'Shipping Info', path: '/shipping', show: true },
+      { label: 'Returns & Exchanges', path: '/returns', show: true },
+      { label: 'Size Guide', path: '/size-guide', show: true },
+      { label: 'Track Order', path: '/track', show: isAuthenticated },
+    ].filter(link => link.show);
+  };
+
+  // Dynamic legal links
+  const getLegalLinks = () => {
+    return [
+      { label: 'Privacy Policy', path: '/privacy', show: true },
+      { label: 'Terms of Service', path: '/terms', show: true },
+      { label: 'Cookie Policy', path: '/cookies', show: true },
+      { label: 'Refund Policy', path: '/refund', show: true },
+    ].filter(link => link.show);
+  };
   return (
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-section">
           <h3>Texol</h3>
           <p>Your one-stop destination for quality products at great prices. We're committed to providing exceptional shopping experiences.</p>
+          {isAuthenticated && (
+            <p className="user-greeting">Welcome back, {user?.firstName || 'Valued Customer'}!</p>
+          )}
           <div className="social-links">
             <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
             <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
@@ -47,11 +100,32 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Shipping Info</a></li>
-            <li><a href="#">Returns</a></li>
+            {getQuickLinks().map((link, index) => (
+              <li key={index}>
+                <button 
+                  onClick={() => navigate(link.path)}
+                  className="footer-link"
+                >
+                  {link.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div className="footer-section">
+          <h4>Customer Support</h4>
+          <ul>
+            {getSupportLinks().map((link, index) => (
+              <li key={index}>
+                <button 
+                  onClick={() => navigate(link.path)}
+                  className="footer-link"
+                >
+                  {link.label}
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
         
@@ -97,11 +171,41 @@ const Footer = () => {
               <span>123 Commerce St, City, State 12345</span>
             </div>
           </div>
+          
+          <div className="footer-legal-links">
+            <h5>Legal</h5>
+            <ul>
+              {getLegalLinks().map((link, index) => (
+                <li key={index}>
+                  <button 
+                    onClick={() => navigate(link.path)}
+                    className="footer-link legal-link"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; 2024 Example. All rights reserved.</p>
+        <div className="footer-bottom-content">
+          <p>&copy; 2024 Texol. All rights reserved.</p>
+          {isAuthenticated && user?.roles?.includes('admin') && (
+            <div className="admin-footer-info">
+              <span>Admin Panel Available</span>
+            </div>
+          )}
+          <div className="footer-bottom-links">
+            <button onClick={() => navigate('/privacy')} className="footer-link">Privacy</button>
+            <span>•</span>
+            <button onClick={() => navigate('/terms')} className="footer-link">Terms</button>
+            <span>•</span>
+            <button onClick={() => navigate('/sitemap')} className="footer-link">Sitemap</button>
+          </div>
+        </div>
       </div>
     </footer>
   );

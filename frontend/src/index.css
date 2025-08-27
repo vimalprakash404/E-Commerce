@@ -2605,10 +2605,21 @@ body {
 
 .footer-section p {
   color: #d1d5db;
+.footer-section h5 {
+  color: #d1d5db;
+  margin: 1rem 0 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
   line-height: 1.6;
   margin-bottom: 1rem;
 }
 
+.user-greeting {
+  color: #4f46e5 !important;
+  font-weight: 500;
+  font-style: italic;
+}
 .footer-section ul {
   list-style: none;
 }
@@ -2617,13 +2628,22 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.footer-section ul li a {
+.footer-link,
+.footer-category-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
   color: #d1d5db;
   text-decoration: none;
   transition: color 0.2s;
+  text-align: left;
+  width: 100%;
 }
 
-.footer-section ul li a:hover {
+.footer-link:hover,
+.footer-category-link:hover {
   color: #2563eb;
 }
 
@@ -2656,28 +2676,60 @@ body {
 }
 
 .footer-bottom {
+.footer-legal-links {
+  margin-top: 1.5rem;
+}
   text-align: center;
+.footer-legal-links ul li {
+  margin-bottom: 0.25rem;
+}
   padding-top: 2rem;
   margin-top: 2rem;
   border-top: 1px solid #374151;
   color: #9ca3af;
+.legal-link {
+  color: #9ca3af;
 }
-
-.footer-category-link {
-  background: none;
-  border: none;
-  color: #d1d5db;
-  cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  text-align: left;
-  transition: color 0.2s ease;
-}
-
-.footer-category-link:hover {
   color: #3b82f6;
+.footer-bottom-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.legal-link:hover {
+.admin-footer-info {
+  background: #4f46e5;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+  color: #d1d5db;
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+}
+.footer-bottom-links .footer-link {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+}
+.footer-bottom-links .footer-link:hover {
+  color: #d1d5db;
 }
 
+.footer-bottom-links span {
+  color: #6b7280;
+}
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-container {
@@ -3015,6 +3067,14 @@ body {
     grid-template-columns: 1fr;
     text-align: center;
     gap: 2rem;
+  }
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-bottom-links {
+    justify-content: center;
   }
 
   .contact-info {
