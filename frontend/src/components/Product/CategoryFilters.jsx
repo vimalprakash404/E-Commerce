@@ -29,8 +29,8 @@ export default function CategoryFilters() {
       {categories.map((category) => (
         <button
           key={category._id}
-          className={selectedCategory === category.slug ? "active" : ""}
-          onClick={() => setSelectedCategory(category.slug)}
+          className={selectedCategory === category._id ? "active" : ""}
+          onClick={() => setSelectedCategory(category._id)}
         >
           {category.name}
         </button>

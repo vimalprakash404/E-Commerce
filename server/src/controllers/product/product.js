@@ -30,7 +30,33 @@ class ProductController {
       tags = tags && tags !== "undefined" && tags !== "null" ? tags : null;
 
       if (search) filter.$text = { $search: search };
-      if (category) filter.category = category.toLowerCase();
+      if (category) {
+        // Check if category is a valid ObjectId
+        const mongoose = require('mongoose');
+        if (mongoose.Types.ObjectId.isValid(category)) {
+          filter.category = category;
+        } else {
+          // If not ObjectId, treat as category name/slug and find the category
+          const Category = require('../../models/category');
+          const categoryDoc = await Category.findOne({
+            $or: [
+              { name: { $regex: new RegExp(`^${category}$`, 'i') } },
+              { slug: category.toLowerCase() }
+            ]
+          });
+          if (categoryDoc) {
+            filter.category = categoryDoc._id;
+          } else {
+            // If category not found, return empty results
+            return res.json({
+              products: [],
+              total: 0,
+              page: Number(page),
+              pages: 0,
+            });
+          }
+        }
+      }
       if (minPrice || maxPrice) {
         filter.price = {};
         if (minPrice && minPrice !== "undefined") filter.price.$gte = Number(minPrice);

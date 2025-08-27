@@ -42,7 +42,7 @@ const ProductFilters = ({
         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
           <option value="all">All Categories</option>
           {categories.map(category => (
-            <option key={category._id} value={category.slug}>{category.name}</option>
+            <option key={category._id} value={category._id}>{category.name}</option>
           ))}
         </select>
 
