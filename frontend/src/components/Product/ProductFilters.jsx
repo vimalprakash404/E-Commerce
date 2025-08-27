@@ -67,7 +67,7 @@ const ProductFilters = ({
           <input
             type="range"
             min="0"
-            max="500"
+            max="10000"
             value={priceRange[1]}
             onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
           />
