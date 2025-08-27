@@ -6,29 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Orders = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { orders, loading, error } = useOrders();
   const [selectedTab, setSelectedTab] = useState('all');
-
-  if (!isAuthenticated) {
-    return (
-      <div className="orders-page">
-        <div className="orders-container">
-          <div className="no-orders">
-            <Package size={64} />
-            <h3>Please login to view orders</h3>
-            <p>Sign in to see your order history and track your purchases.</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => navigate('/login')}
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {

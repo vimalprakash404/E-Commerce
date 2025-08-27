@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
   const { items, loading, error, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } = useCart();
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   const handleUpdateQuantity = async (productId, newQuantity) => {
@@ -24,23 +23,6 @@ const Cart = () => {
     }
   };
   
-  if (!isAuthenticated) {
-    return (
-      <div className="cart-empty">
-        <div className="cart-empty-content">
-          <ShoppingBag size={64} />
-          <h2>Please login to view your cart</h2>
-          <p>Sign in to see your saved items and continue shopping</p>
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate('/login')}
-          >
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

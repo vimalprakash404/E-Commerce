@@ -8,7 +8,6 @@ import apiService from '../services/api';
 const Bill = () => {
     const navigate = useNavigate();
   const { items, getTotalPrice, clearCart, loading } = useCart();
-  const { isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -160,25 +159,6 @@ const Bill = () => {
       setPlacingOrder(false);
     }
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="bill-page">
-        <div className="bill-container">
-          <div className="empty-cart-message">
-            <h2>Please login to checkout</h2>
-            <p>You need to be logged in to place an order.</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => navigate('/login')}
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

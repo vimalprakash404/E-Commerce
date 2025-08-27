@@ -5,6 +5,9 @@ import { AppProvider } from './context/AppContext';
 import { CartProvider } from './context/CartContext';
 import Footer from './components/common/Footer';
 import { AuthProvider } from './context/AuthContext';
+import AuthGuard from './components/common/AuthGuard';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import PublicRoute from './components/common/PublicRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -28,13 +31,37 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<ProductList />} />
               <Route path="/product-details/" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
+              <Route path="/cart" element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<h2>Page Not Found</h2>} />
-              <Route path='/login' element={<Login/>} />
-              <Route path='/signup' element={<Signup/>} />
-              <Route path='/bill' element={<Bill/>} />
-              <Route path='/order' element={<Orders/>} />
-              <Route path='/admin' element={<AdminDashboard/>} />
+              <Route path='/login' element={
+                <PublicRoute>
+                  <Login/>
+                </PublicRoute>
+              } />
+              <Route path='/signup' element={
+                <PublicRoute>
+                  <Signup/>
+                </PublicRoute>
+              } />
+              <Route path='/bill' element={
+                <ProtectedRoute>
+                  <Bill/>
+                </ProtectedRoute>
+              } />
+              <Route path='/order' element={
+                <ProtectedRoute>
+                  <Orders/>
+                </ProtectedRoute>
+              } />
+              <Route path='/admin' element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminDashboard/>
+                </ProtectedRoute>
+              } />
             </Routes>
             <Footer />
           </Router>

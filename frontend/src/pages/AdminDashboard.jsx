@@ -38,13 +38,8 @@ const AdminDashboard = () => {
   const socket = useSocket();
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.roles?.includes('admin')) {
-      navigate('/login');
-      return;
-    }
-    
     fetchDashboardStats();
-  }, [isAuthenticated, user, navigate]);
+  }, []);
 
   useEffect(() => {
     if (socket) {
