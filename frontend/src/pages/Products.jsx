@@ -17,7 +17,7 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState('grid');
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get category from URL params on component mount
