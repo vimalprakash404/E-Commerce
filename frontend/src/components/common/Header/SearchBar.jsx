@@ -1,13 +1,22 @@
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 
 export default function SearchBar() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get("q") || "";
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSearchParams({ q: query, view: "products" }); // go to products with query
+    if (query.trim()) {
+      navigate(`/products?search=${encodeURIComponent(query.trim())}`);
+    } else {
+      navigate('/products');
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
   };
 
   return (
@@ -16,7 +25,7 @@ export default function SearchBar() {
         type="text"
         placeholder="Search products..."
         value={query}
-        onChange={(e) => setSearchParams({ q: e.target.value, view: "products" })}
+        onChange={handleInputChange}
         className="search-input"
       />
       <button type="submit" className="search-btn">
